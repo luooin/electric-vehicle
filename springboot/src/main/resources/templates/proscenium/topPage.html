@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}"</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <!-- layui样式 -->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base information-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="info-list-box" style="background: url('/resource/image/webImg2.jpeg ');background-size: 100% 100%">
+        <div class="layui-row" style="padding: 50px">
+            <div class="layui-col-xs4">
+                <table class="layui-table" style="width: 90%;margin: 0 auto">
+                    <colgroup>
+                        <col width="150">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td colspan="2" style="font-weight: bolder;text-align: center">车辆租借榜</td>
+
+                    </tr>
+                    <tr th:each="product,str:${productList}">
+                        <td><img th:src="${product.img}"></td>
+                        <td>
+                            <p style="font-weight: bolder;font-size: 18px;color: #FFB800" th:text="${str.count}"></p>
+                            <a th:text="${product.name}" th:href="${'/productDetails?id='+product.id}"></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="layui-col-xs4">
+                <table class="layui-table" style="width: 90%;margin: 0 auto">
+                    <colgroup>
+                        <col width="150">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td colspan="2" style="font-weight: bolder;text-align: center">上传车辆榜</td>
+
+                    </tr>
+                    <tr th:each="send,str:${sendNumList}">
+                        <td><img th:src="${send.imgUrl}"></td>
+                        <td>
+                            <p style="font-weight: bolder;font-size: 18px;color: #FFB800" th:text="${str.count}"></p>
+                            <a th:text="${send.userName}"></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="layui-col-xs4">
+                <table class="layui-table" style="width: 90%;margin: 0 auto">
+                    <colgroup>
+                        <col width="150">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td colspan="2" style="font-weight: bolder;text-align: center">租借车辆榜</td>
+
+                    </tr>
+                    <tr th:each="send,str:${getNumList}">
+                        <td><img th:src="${send.imgUrl}"></td>
+                        <td>
+                            <p style="font-weight: bolder;font-size: 18px;color: #FFB800" th:text="${str.count}"></p>
+                            <a th:text="${send.userName}"></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['laypage'], function () {
+        var laypage = layui.laypage;
+        laypage.render({
+            elem: 'demo0'
+            , count: 100 //数据总数
+        });
+    });
+
+</script>
+
+
+</body>
+</html>

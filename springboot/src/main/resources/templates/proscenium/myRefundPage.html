@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/userCenter.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<style>
+    .layui-table-cell {
+        /*line-height: 17px !important;*/
+        vertical-align: middle !important;
+        height: auto !important;
+        overflow: visible !important;
+        text-overflow: inherit !important;
+        white-space: normal !important;
+    }
+</style>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="layui-container userpublic house-userPer content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="layui-row layui-col-space20">
+        <p class="layui-hide-xs title">首页 &gt; <span>我的发表</span></p>
+        <div class="layui-col-sm2">
+            <ul class="user-list">
+                <li><a href="/userCenter">个人中心</a></li>
+                <li><a href="/addProductPage">发布车辆</a></li>
+                <li><a href="/myProductPage">我的车辆</a></li>
+                <li><a href="/myOrderPage">我的出租</a></li>
+                <li class="active"><a href="/myRefundPage">归还处理</a></li>
+                <li><a href="/address">租赁人信息</a></li>
+                <li th:if="${payType eq'balance'}"><a href="/wallet">我的钱包</a></li>
+                <li><a href="/collectPage">我的收藏</a></li>
+                <li><a href="/browsePage">浏览记录</a></li>
+                <li><a href="/safety">安全设置</a></li>
+                <li><a href="/editUser">个人资料</a></li>
+                <li><a href="/leavePage">我的上报</a></li>
+
+
+            </ul>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="layui-form">
+                <div class="layui-fluid">
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md12">
+                            <div class="layui-card">
+                                <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                                    <ul class="layui-tab-title">
+                                        <li class="layui-this"><i class="czs-face-l"></i>归还处理</li>
+                                    </ul>
+                                    <div class="layui-tab-content">
+                                        <div class="layui-tab-item layui-show">
+                                            <div class="layui-card-body layui-row"
+                                                 style="padding: 20px;">
+                                                <table class="layui-hide" id="table-list"></table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="column-toolbar">
+    {{#  if(d.state=='0'){ }}
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="agree">
+        同意
+    </button>
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="refuse">
+        拒绝
+    </button>
+    {{#  } else { }}
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title="删除"></i>
+        删除
+    </button>
+    {{#  } }}
+</script>
+<script type="text/html" id="stateTpl">
+    {{#  if(d.state=='0'){ }}
+    <button type="button" class="layui-btn  layui-btn-primary layui-btn-xs">
+        待审核
+    </button>
+    {{#  } else if(d.state=='2') { }}
+    <button type="button" class="layui-btn  layui-btn-danger layui-btn-xs">
+        未同意
+    </button>
+    {{#  } else if(d.state=='1') { }}
+    <button type="button" class="layui-btn  layui-btn-xs">
+        已同意
+    </button>
+    {{#  } }}
+</script>
+<script type="text/html" id="urlTpl">
+    <span style="cursor: pointer;color: #1E9FFF"><i class="layui-icon layui-icon-picture"></i>点击查看</span>
+</script>
+<script type="text/html" id="contentTpl">
+
+
+    <p style="color: #888888;font-size: 12px">说明:{{d.content}}</p>
+</script>
+<script type="text/html" id="product-main">
+    <p style="color: #FF5722;font-weight: bold">{{d.uuId}}</p>
+    <p style="color: #888888;font-size: 12px">{{d.productName}}</p>
+    <p style="color: #888888;font-size: 12px">{{d.specification}}</p>
+</script>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script src="/resource/layui/layui.js"></script>
+
+<script th:inline="javascript">
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'dtree', 'laydate', 'form', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var dtree = layui.dtree;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        form.on('submit(search)', function (form) {
+            table.reload('table-list', {
+                where: form.field
+            });
+            return false;
+        });
+
+        table.render({
+            elem: '#table-list',
+            url: '/order/refundTable.do',
+            cellMinWidth: 80,
+            skin: 'nob',
+            page: {theme: '#da697d'},
+            // toolbar: '#toolbar',
+            smartReloadModel: true,
+            cols: [
+                [
+
+                    {field: 'uuId', title: '订单信息', minWidth: 200, templet: "#product-main"},
+                    {field: 'state', title: '状态', align: 'center', templet: "#stateTpl"},
+                    {field: 'img', title: '反馈图片', width: 120, align: 'center', templet: "#urlTpl", event: "upImg"},
+                    {field: 'leave', title: '归还信息', templet: "#contentTpl"},
+                    {title: '操作', fixed: 'right', align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ],
+            done: function (res, curr, count) {
+                $(".layui-table-main tr").each(function (index, val) {
+                    $($(".layui-table-fixed-l .layui-table-body tbody tr")[index]).height($(val).height());
+                    $($(".layui-table-fixed-r .layui-table-body tbody tr")[index]).height($(val).height());
+                })
+            }
+        });
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'del') {
+                layer.confirm("确定删除吗?", {icon: 3, title: '提示'},
+                    function (index) {// 确定回调
+                        $.ajax({
+                            url: "/order/refund.do",
+                            type: "post",
+                            data: {_method: "DELETE", "id": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('table-list');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {//取消回调
+                        layer.close(index);
+                    }
+                );
+            } else if (event === 'upImg') {
+                var imgs = eval('(' + data.imgs + ')');
+                console.log(imgs)
+                var data = [];
+                for (item in imgs) {
+                    var obj = {};
+                    obj.src = imgs[item];
+                    data.push(obj);
+                }
+                console.log(data)
+                layer.photos({
+                    photos: {
+                        "title": "查看大图", //相册标题
+                        "start": 0, //初始显示的图片序号，默认0
+                        "data": data
+                    }
+                    , anim: 2//0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                });
+            } else if (event === 'agree') {
+                editStatus(data.id, '1', data.orderId)
+            } else if (event === 'refuse') {
+                editStatus(data.id, '2', data.orderId)
+            }
+        });
+
+        //修改状态函数
+        function editStatus(id, state, orderId) {
+            $.ajax({
+                url: "/order/refund.do",
+                type: "put",
+                data: {"id": id, 'state': state, "orderId": orderId},
+                dataType: "json",
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {icon: 5});
+                    }
+                    layer.msg('操作成功!', {icon: 6});
+                    layui.table.reload('table-list');
+                }
+
+            });
+        }
+    });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<body>
+<div class="yadmin-body animated fadeIn">
+
+    <table class="layui-hide" id="table-list"></table>
+</div>
+<script type="text/html" id="toolbar">
+    <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="add">
+        <i class="layui-icon layui-icon-addition"></i>
+        新增
+    </button>
+</script>
+
+<script type="text/html" id="column-toolbar">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+        <i class="layui-icon layui-icon-edit" title="编辑"></i>
+        编辑
+    </button>
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title="删除"></i>
+        删除
+    </button>
+
+</script>
+<script type="text/html" id="stateTpl">
+    <button class="layui-btn layui-btn-radius {{d.state== '1' ? ' ' : 'layui-btn-danger' }} layui-btn-xs" >
+        {{d.state== '1' ? '&nbsp;显示&nbsp;' : '&nbsp;隐藏&nbsp;' }}
+    </button>
+</script>
+<script type="text/html" id="urlTpl">
+    <img src="{{d.url}}" class="layer-photos">
+</script>
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script>
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'dtree', 'form', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var dtree = layui.dtree;
+        var form = layui.form;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        form.on('submit(search)', function (form) {
+            table.reload('table-list', {
+                where: form.field
+            });
+            return false;
+        });
+
+        table.render({
+            elem: '#table-list',
+            url: '/slideshow/slideshow.do',
+            cellMinWidth: 80,
+            page: true,
+            skin: 'nob',
+            toolbar: '#toolbar',
+            smartReloadModel: true,
+            cols: [
+                [
+                    {field: 'productId', title: '车辆ID'},
+                    {field: 'url', title: '图片', width: 170, align: 'center', templet: "#urlTpl", event: "upImg"},
+                    {field: 'time', title: '加入时间'},
+                    {field: 'userName', title: '操作人'},
+                    {field: 'state', title: '状态', align: 'center', templet: "#stateTpl", width: 100},
+                    {title: '操作', fixed: 'right', width: 200, align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ]
+        });
+        table.on('toolbar', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'add') {
+                layer.open({
+                    content: "/slideshow/addPage.do",
+                    title: "新增图片",
+                    area: ['500px', '500px'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            }
+        });
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'del') {
+                layer.confirm("确定删除吗?", {icon: 3, title: '提示'},
+                    function (index) {// 确定回调
+                        $.ajax({
+                            url: "/slideshow/slideshow.do",
+                            type: "post",
+                            data: {_method: "DELETE", "ids": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('table-list');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {//取消回调
+                        layer.close(index);
+                    }
+                );
+            } else if (event === 'upImg') {
+                layer.photos({
+                    photos: {
+                        "title": "查看大图", //相册标题
+                        "start": 0, //初始显示的图片序号，默认0
+                        "data": [   //相册包含的图片，数组格式
+                            {
+                                "src": data.url, //原图地址
+                                "thumb": "" //缩略图地址
+                            }
+                        ]
+                    }
+                    , anim: 2//0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                });
+            } else if (event === 'edit') {
+                layer.open({
+                    content: "/slideshow/editPage.do?id=" + data.id,
+                    title: "编辑图片",
+                    area: ['500px', '500px'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

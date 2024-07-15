@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/userCenter.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<style>
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #da697d !important;
+    }
+
+    .img-product-my img {
+        width: 200px;
+        height: 200px;
+        border-radius: 20px;
+    }
+
+    .detail-product-my {
+        padding: 5px;
+        line-height: 35px;
+    }
+
+    .detail-product-my .title-my {
+        font-weight: bold;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+
+    .detail-product-my .specification-my {
+        font-size: 13px;
+        color: #888;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+
+    .detail-product-my .price-my {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .detail-product-my .state-my {
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="layui-container userpublic house-userPer content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="layui-row layui-col-space20">
+        <p class="layui-hide-xs title">首页 &gt; <span>我的发表</span></p>
+        <div class="layui-col-sm2">
+            <ul class="user-list">
+                <li><a href="/userCenter">个人中心</a></li>
+                <li><a href="/addProductPage">发布车辆</a></li>
+                <li class="active"><a href="/myProductPage">我的车辆</a></li>
+                <li><a href="/myOrderPage">我的出租</a></li>
+                <li><a href="/myRefundPage">归还处理</a></li>
+                <li><a href="/address">租赁人信息</a></li>
+                <li th:if="${payType eq'balance'}"><a href="/wallet">我的钱包</a></li>
+                <li><a href="/collectPage">我的收藏</a></li>
+                <li><a href="/browsePage">浏览记录</a></li>
+                <li><a href="/safety">安全设置</a></li>
+                <li><a href="/editUser">个人资料</a></li>
+                <li><a href="/leavePage">我的上报</a></li>
+
+
+            </ul>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="layui-form">
+                <div class="layui-fluid">
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md12">
+                            <div class="layui-card">
+                                <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                                    <ul class="layui-tab-title">
+                                        <li class="layui-this"><i class="czs-face-l"></i>我的车辆</li>
+
+                                    </ul>
+                                    <div class="layui-tab-content">
+                                        <div class="layui-tab-item layui-show">
+                                            <div class="layui-card-body layui-row"
+                                                 style="padding: 20px;">
+                                                <div class="layui-col-md6" th:each="product:${productList}">
+                                                    <div class="layui-panel">
+                                                        <div class="layui-row" style="padding: 50px 30px;">
+                                                            <div class="layui-col-md6 img-product-my">
+                                                                <img th:src="${product.img}">
+                                                            </div>
+                                                            <div class="layui-col-md6 detail-product-my">
+                                                                <p class="title-my" th:text="${product.name}">
+
+                                                                </p>
+                                                                <p class="specification-my"
+                                                                   th:text="${product.specification}"></p>
+                                                                <div class="layui-row price-my">
+                                                                    <div class="layui-col-md6">
+                                                                        <p>数量:<span
+                                                                                th:text="${product.inventory}"></span>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="layui-col-md6">
+                                                                        <p>售价:<span style="color: #da697d"
+                                                                                    th:text="${product.disPrice}"></span>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="layui-row state-my">
+                                                                    <p>状态:
+                                                                        <span style="color: #FF5722"
+                                                                              th:if="${product.state eq '0'}">审核中</span>
+                                                                        <span style="color: #5FB878"
+                                                                              th:if="${product.state eq '1'}">租赁中</span>
+                                                                        <span style="color: #FFB800"
+                                                                              th:if="${product.state eq '2'}">未通过</span>
+                                                                        <span style="color: #2F4056"
+                                                                              th:if="${product.state eq '3'}">已售出</span>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="layui-row" th:if="${product.state eq '0'}">
+                                                                    <button th:id="${product.id}"
+                                                                            class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm  edit-product">
+                                                                        编辑
+                                                                    </button>
+                                                                    <button th:id="${product.id}"
+                                                                            class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm del-product">
+                                                                        下架
+                                                                    </button>
+                                                                </div>
+                                                                <div class="layui-row" th:if="${product.state eq '1'}">
+                                                                    <button th:id="${product.id}"
+                                                                            class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm del-product">
+                                                                        下架
+                                                                    </button>
+                                                                </div>
+                                                                <div class="layui-row" th:if="${product.state eq '2'}">
+                                                                    <button th:id="${product.id}"
+                                                                            class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm  edit-product-2">
+                                                                        重新提交
+                                                                    </button>
+                                                                    <button th:id="${product.id}"
+                                                                            class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm del-product">
+                                                                        删除
+                                                                    </button>
+                                                                </div>
+                                                                <div class="layui-row" th:if="${product.state eq '3'}">
+                                                                    <button th:id="${product.id}"
+                                                                            class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm del-product">
+                                                                        删除
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'jquery', 'layer', 'table', 'element', 'upload'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var element = layui.element;
+        //删除
+        $('.del-product').on('click', function () {
+            var id = $(this).attr('id');
+            $.ajax({
+                url: '/product/product.do',
+                type: 'post',
+                data: {_method: "DELETE", "id": id},
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg('操作失败', {icon: 5});
+                        return false;
+                    } else {
+                        layer.msg("下架成功!", {
+                            icon: 6, time: 1000, end: function () {
+                                location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        })
+        $('.edit-product').on('click', function () {
+            var id = $(this).attr('id');
+            layer.open({
+                content: "/product/editPage.do?id=" + id,
+                title: "编辑",
+                area: ['60%', '80%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true
+            });
+
+        })
+        $('.edit-product-2').on('click', function () {
+            var id = $(this).attr('id');
+            layer.open({
+                content: "/product/editPageII.do?id=" + id,
+                title: "编辑并重新提交",
+                area: ['60%', '80%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true
+            });
+
+        })
+
+    });
+
+</script>
+
+</body>
+</html>

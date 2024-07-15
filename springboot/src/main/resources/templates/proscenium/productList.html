@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <!-- layui样式 -->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base commodity-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="commod-cont-wrap">
+        <div class="commod-cont w1200 layui-clear">
+            <div class="left-nav">
+                <div class="title" th:text="${category.name}"></div>
+                <div class="list-box">
+                    <dl th:each="category:${categoryList}">
+                        <dt th:text="${category.name}" th:id="${category.id}"></dt>
+                    </dl>
+                </div>
+            </div>
+            <div class="right-cont-wrap">
+                <div class="right-cont">
+                    <div class="sort layui-clear">
+                        <a class="active" href="javascript:;" event='time'>新品</a>
+                        <a href="javascript:;" event='disPrice'>价格</a>
+                        <a href="javascript:;" event='collectNum'>收藏</a>
+                    </div>
+                    <div class="prod-number" style="padding: 0px; ">
+                        <div class="layui-row layui-col-space15">
+                            <div class="layui-col-md12" style="width: 94%">
+                                <div class="layui-card">
+                                    <div class="layui-card-header sonCategory">所有车辆</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cont-list layui-clear" id="list-cont"></div>
+                    <div id="demo0" style="text-align: center;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script th:inline="javascript">
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'laypage', 'jquery', 'layer'], function () {
+        var laypage = layui.laypage, $ = layui.$, layer = layui.layer,
+            mm = layui.mm;
+        //初始参数设置
+        var categoryId;
+        var parentId = [[${category.id}]];
+        var orderFiled;
+        var count = getCount(parentId);
+        laypage_Init(count, categoryId, parentId)
+        //点击排序操作
+        $('.sort a').on('click', function () {
+            $(this).addClass('active').siblings().removeClass('active');
+            orderFiled = $(this).attr('event')
+            laypage_Init(count, categoryId, parentId, orderFiled)
+        })
+        //右侧子分类点击操作
+        $('.list-box dd').on('click', function () {
+            $('.list-box dd').children("a").css('color', '#888888')
+            //重新获取数据总数(因为点击分类后总数会有变化)
+            count = getCount($(this).attr('id'))
+            $(this).children("a").css('color', '#ff5500')
+            //获取当前点击的类别赋值到头部
+            $('.layui-card-header').text($(this).siblings("dt").text() + ' / ' + $(this).children("a").text())
+            categoryId = $(this).attr('id')
+            //重新加载分页
+            laypage_Init(count, categoryId, orderFiled)
+        })
+        //右侧父分类点击展开操作
+        $('.list-box dt').on('click', function () {
+            $('.sonCategory').text($(this).text())
+            categoryId = $(this).attr('id')
+            count = getCount(parentId, $(this).attr('id'))
+            //重新加载分页
+            laypage_Init(count, categoryId, parentId, orderFiled)
+        })
+
+        //获取车辆总数函数
+        function getCount(parentId, categoryId) {
+            var count = 0;
+            $.ajax({
+                url: '/product/getCount.do',
+                type: 'post',
+                data: {"parentId": parentId, "categoryId": categoryId},
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    count = data.obje
+                }
+            });
+            return count;
+        }
+
+        //加载分页插件函数
+        function laypage_Init(count, categoryId, parentId, orderFiled) {
+            laypage.render({
+                elem: 'demo0' //注意，这里的 test1 是 ID，不用加 # 号
+                , limit: '12'//默认条数,从服务端得到
+                , curr: 1
+                , count: count
+                , theme: '#da697d'
+                , jump: function (obj, first) {
+                    createList(categoryId, obj.curr, obj.limit, parentId, orderFiled);
+                }
+            });
+        }
+
+        //生成车辆列表函数
+        function createList(categoryId, page, limit, parentId, orderFiled) {
+            var count = 0;
+            //清空cont-list div
+            $('.cont-list').html('')
+            console.log(parentId)
+            //向后台请求数据
+            $.ajax({
+                url: '/product/product.do',
+                type: 'get',
+                data: {
+                    "categoryId": categoryId,
+                    "page": page,
+                    "limit": limit,
+                    "orderFiled": orderFiled,
+                    "parentCategoryId": parentId,
+                    "state": "1",
+                },
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (result.code == 0) {
+                        //加载车辆列表
+                        var data = result.data;
+                        var str = '';
+                        for (var i = 0; i < data.length; i++) {
+                            str += '<div class="item">';
+                            str += '    <div class="img">';
+                            str += '        <a href="/productDetails?id=' + data[i].id + '"><img style="width: 280px;height: 280px;object-fit: cover;" src="' + data[i].img + '"></a>';
+                            str += '    </div>';
+                            str += '    <div class="text">';
+                            str += '        <p style=" overflow: hidden; display: -webkit-box;   -webkit-line-clamp: 1; -webkit-box-orient: vertical; class="title">' + data[i].name + '</p>';
+                            str += '        <p class="price">';
+                            str += '            <span class="pri">￥' + data[i].disPrice + '</span>';
+
+                            str += '        </p>';
+                            str += '    </div>';
+                            str += '</div>';
+                        }
+                        //追加到cont-list div中
+                        $('.cont-list').html(str)
+                        count = result.count;
+                    } else {
+                        layer.msg("暂无数据");
+                    }
+                }
+            });
+            return count;
+        }
+    });
+</script>
+
+
+</body>
+</html>

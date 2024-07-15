@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <link rel="stylesheet" href="/resource/layui/extend/formSelects-v4.css">
+</head>
+<style>
+    .layui-form-label {
+        width: 90px;
+    }
+
+    input::-webkit-input-placeholder {
+        color: #d2d2d2;
+    }
+
+    input::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color: #d2d2d2;
+    }
+
+    input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color: #d2d2d2;
+    }
+
+    input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #d2d2d2;
+    }
+
+    .layui-input-block {
+        width: 90%;
+        margin-left: 90px;
+    }
+
+    .layui-input, .layui-select, .layui-textarea {
+        height: 30px;
+    }
+
+    .layui-input-inline {
+        width: 50%;
+    }
+</style>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label for="content" class="layui-form-label">
+                情况说明:
+            </label>
+            <div class="layui-input-block">
+                <textarea type="text" id="content" name="content" lay-verify="required" lay-vertype="tips"
+                          autocomplete="off" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <input hidden="" name="productId" th:value="${productId}">
+                <button class="layui-btn layui-btn-normal btn-w100" lay-submit="" lay-filter="add"><i
+                        class="layui-icon layui-icon-add-1"></i>提交
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+<script th:inline="javascript">
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).extend({
+        formSelects: 'formSelects-v4'
+    }).use(['form', 'layer', 'upload', 'layedit', 'formSelects', 'dtree'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+
+
+        form.on('submit(add)', function (form) {
+            $.ajax({
+                url: '/abnormal/report.do',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        layer.msg("提交成功!", {
+                            icon: 6, time: 1000, end: function () {
+                                parent.location.reload()
+                            }
+                        })
+                    }
+                }
+
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

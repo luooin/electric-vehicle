@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <form class="layui-form yadmin-search-area input">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label for="username" class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userName" autocomplete="off"
+                           id="username" class="layui-input">
+                </div>
+
+                <label for="iphone" class="layui-form-label">手机</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="iphone" autocomplete="off"
+                           id="iphone" class="layui-input">
+                </div>
+                <label for="status" class="layui-form-label">角色</label>
+                <div class="layui-input-inline">
+                    <select name="roleId" id="roleId">
+                        <option value="">请选择</option>
+                        <option th:each="item:${roleList}" th:text="${item.role}"
+                                th:value="${item.id}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label for="status" class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <select name="status" id="status">
+                        <option value="">请选择</option>
+                        <option value="1">正常</option>
+                        <option value="0">锁定</option>
+                    </select>
+                </div>
+                <button lay-submit="" lay-filter="search" class="layui-btn layui-btn-sm layui-btn-primary table-action">
+                    <i class="layui-icon layui-icon-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    <span style="color: red;font-size: 13px">注:双击单元行查看评价</span>
+    <table class="layui-hide" id="user-table"></table>
+</div>
+
+<script type="text/html" id="toolbar">
+
+    <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="add">
+        <i class="layui-icon layui-icon-addition"></i>
+        新增
+    </button>
+
+</script>
+
+<script type="text/html" id="column-toolbar">
+    {{#  if(d.roleId!='1'){ }}
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+        <i class="layui-icon layui-icon-edit" title="编辑"></i>
+        编辑
+    </button>
+
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title="删除"></i>
+        删除
+    </button>
+    {{#  } else { }}
+    <button type="button" class="layui-btn layui-btn-disabled layui-btn-xs">
+        无法操作
+    </button>
+    {{#  } }}
+</script>
+
+<script type="text/html" id="statusTpl">
+    {{#  if(d.roleId!='1'){ }}
+    <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="正常|锁定" lay-filter="status" {{
+           d.status== '1' ? 'checked' : '' }}>
+    {{#  } else { }}
+    <button type="button" class="layui-btn layui-btn-disabled layui-btn-xs">
+        无法操作
+    </button>
+    {{#  } }}
+</script>
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script>
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'form', 'dtree', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var form = layui.form;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        table.render({
+            elem: '#user-table',
+            url: '/user/user.do',
+            page: true,
+            toolbar: '#toolbar',
+            smartReloadModel: true,
+            cols: [
+                [
+                    {type: 'checkbox'},
+                    {type: 'numbers', title: '序号', width: 60},
+                    {field: 'userName', title: '用户名', minWidth: 100},
+                    {field: 'realName', title: '姓名', minWidth: 100},
+                    {field: 'rank', title: '是否会员', minWidth: 100},
+                    {field: 'roleName', title: '角色', minWidth: 100},
+                    {field: 'email', title: '邮箱', minWidth: 160},
+                    {field: 'iphone', title: '手机', minWidth: 160},
+                    {field: 'createdDate', title: '创建时间', align: 'center', width: 180},
+                    {field: 'updateDate', title: '最后登陆时间', align: 'center', width: 180},
+                    {field: 'status', title: '状态', align: 'center', templet: "#statusTpl", width: 100},
+                    {title: '操作', fixed: 'right', align: 'center', toolbar: '#column-toolbar', width: 180}
+                ]
+            ]
+        });
+        // 账号状态(正常/锁定)点击事件
+        form.on('switch(status)', function (data) {
+            if (data.elem.checked) {
+                editStatus(data.value, "1")
+                parent.layer.msg("激活成功", {icon: 6});
+            } else {
+                editStatus(data.value, "0")
+                parent.layer.msg("禁用成功", {icon: 6});
+            }
+        });
+        // 工具条点击事件
+        table.on('toolbar', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'add') {
+                layer.open({
+                    content: "/user/addUserHouser.do",
+                    title: "新增用户",
+                    area: ['40%', '85%'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            }
+        });
+
+        // 行点击事件 重置密码
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'edit') {
+                layer.open({
+                    content: "/user/editUserHouser.do?id=" + data.id,
+                    title: "编辑用户",
+                    area: ['40%', '85%'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            } else if (event === 'del') {
+                layer.confirm("确定删除用户吗?", {icon: 3, title: '提示'},
+                    function (index) {
+                        $.ajax({
+                            url: "/user/user.do",
+                            type: "post",
+                            data: {_method: "DELETE", "ids": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('user-table');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {
+                        layer.close(index);
+                    }
+                );
+            }
+        });
+        //监听行双击事件
+        table.on('rowDouble', function (obj) {
+            console.log(obj.data) //得到当前行数据
+            //弹出评价列表
+            layer.open({
+                content: "/product/evaluate.do?productId=" + obj.data.id,
+                title: "评价列表",
+                area: ['70%', '90%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true
+            });
+        });
+        //搜索点击事件
+        form.on('submit(search)', function (form) {
+            table.reload('user-table', {
+                where: form.field
+            });
+            return false;
+        });
+
+        //用户修改状态函数
+        function editStatus(id, status) {
+            $.ajax({
+                url: "/user/user.do",
+                type: "put",
+                data: {"id": id, 'status': status},
+                dataType: "json",
+                success: function (result) {
+                    if (!result.status) {
+                        return false;
+                    }
+                    return true
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

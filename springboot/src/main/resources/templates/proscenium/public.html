@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <!-- layui样式 -->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body id="list-cont">
+<!--页面头部公共元素-->
+<div th:fragment="head">
+    <div class="site-nav-bg">
+        <div class="site-nav w1200">
+            <p class="sn-back-home">
+                <i class="layui-icon layui-icon-home"></i>
+                <a href="/diplomaProject">首页</a>
+                <i th:if="${!is_general && is_loin}" class="layui-icon layui-icon-more-vertical"></i>
+                <i th:if="${!is_general && is_loin}" class="layui-icon layui-icon-app"></i>
+                <a th:if="${!is_general && is_loin}" href="/diplomaProjectAdmin">后台</a>
+            </p>
+            <div class="sn-quick-menu">
+                <div class="login" th:if="${!is_loin}"><a href="/">登录</a></div>
+                <div class="login" th:if="${!is_loin}"><a href="/prosceniumReg">注册</a></div>
+                <div class="login" th:if="${is_loin}"><a href="/userCenter">个人中心</a></div>
+
+                <div class="login" th:if="${is_loin}"><a href="/logout.do">注销</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="header">
+        <div class="headerLayout w1200">
+            <div class="headerCon">
+                <h1 class="mallLogo">
+                    <a href="/diplomaProject" th:text="${wbeParameter.name}"
+                       style="font-weight: bold;font-size: 25px;color: #da697d"></a>
+                </h1>
+                <div class="mallSearch">
+                    <form action="/search">
+                        <input type="text" name="productName" required lay-verify="required" autocomplete="off"
+                               class="layui-input search-name" placeholder="请输入关键词查询">
+                        <button class="layui-btn search-btn" lay-submit lay-filter="formDemo">
+                            <i class="layui-icon layui-icon-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main-nav" th:fragment="main-nav">
+    <div class="inner-cont0">
+        <div class="inner-cont1 w1200" style="height: 44px;line-height: 44px;width: 1300px">
+            <div class="inner-cont2">
+                <a href="/diplomaProject" th:class="${indexClass}">首页</a>
+                <a href="/discussPage" th:class="${discussClass}">问题上报</a>
+                <a href="/noticeListPage" th:class="${noticeListPage}">系统公告</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:fragment="footer">
+    <div class="ng-promise-box">
+        <div class="ng-promise w1200"></div>
+    </div>
+    <div class="mod_help w1200">
+        <p>
+            <wyao th:each="link:${linkList}">
+                <a th:href="${link.url}" th:text="${link.name}" target="_blank" style="margin-left: 5px"></a>
+
+            </wyao>
+        </p>
+        <p class="coty"><span th:text="${wbeParameter.name}"></span>版权所有 &copy; 2033-2044</p>
+    </div>
+</div>
+</body>
+</html>

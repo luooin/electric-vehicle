@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<style>
+    .layui-tab-brief > .layui-tab-title .layui-this {
+        color: #da697d !important;
+    }
+
+    .layui-tab-brief > .layui-tab-more li.layui-this:after, .layui-tab-brief > .layui-tab-title .layui-this:after {
+        border-bottom: 2px solid #da697d !important;
+    }
+
+    .layui-card-header {
+        background: #f2f2f2;
+        border-bottom: 1px solid #DEDEDE !important;
+    }
+
+    .layui-card {
+        border-bottom: 1px solid #DEDEDE
+    }
+
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #da697d !important;
+    }
+
+    .banckImg {
+        width: 180px;
+        height: 80px;
+    }
+
+    .layui-table img {
+        max-width: 200px !important;
+    }
+
+    .bank {
+        text-align: center;
+        height: 120px;
+        line-height: 120px;
+    }
+
+    .pwd-box {
+
+        width: 259px;
+
+        padding-left: 1px;
+
+        position: relative;
+
+        border: 1px solid #9f9fa0;
+
+        border-radius: 3px;
+
+        over-flow: hidden
+
+    }
+
+    .pwd-box input[type="tel"] {
+
+        width: 99%;
+
+        height: 40px;
+
+        color: transparent;
+
+        position: absolute;
+
+        top: 0;
+
+        left: 0;
+
+        border: none;
+
+        font-size: 18px;
+
+        opacity: 0;
+
+        z-index: 1;
+
+        letter-spacing: 30px;
+
+    }
+
+    .fake-box input {
+
+        width: 39px;
+
+        height: 40px;
+
+        border: none;
+
+        border-right: 1px solid #e5e5e5;
+
+        text-align: center;
+
+        font-size: 30px;
+
+    }
+
+    .fake-box input:nth-last-child(1) {
+
+        border: none;
+
+    }
+</style>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base datails-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="data-cont-wrap w1200 layui-form">
+        <div style="padding: 20px;">
+            <div class="layui-row layui-col-space15">
+                <div th:if="${payType eq'simulation'}" class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">选择支付方式</div>
+                        <div class="layui-card-body">
+                            <table class="layui-table">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" src="/resource/image/bank1.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" style="height: 70px" src="/resource/image/bank2.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" style="height: 70px" src="/resource/image/bank3.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" src="/resource/image/bank4.png">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" style="height: 70px" src="/resource/image/bank5.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" src="/resource/image/bank6.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" src="/resource/image/bank7.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" style="height: 112px" src="/resource/image/bank8.png">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="bank">
+                                            <img class="banckImg" src="/resource/image/bank9.png">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank" style="border: 2px ridge #da697d">
+                                            <img class="banckImg" src="/resource/image/alpppay.png"
+                                                 style="height: 41px;width: 147px">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bank">
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${payType eq'simulation'}" class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">输入卡号</div>
+                        <div class="layui-card-body">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline" style="width: 40%">
+                                    <input type="text" placeholder="请输入银行卡号或支付宝账号" lay-verify="required"
+                                           lay-vertype="tips" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">此处为模拟支付,不去验证卡号或账号的正确性</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">输入密码</div>
+                        <div class="layui-card-body">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline" style="width: 40%">
+                                    <span><i class="layui-icon" style="color: #5fb878;font-weight: bold">&#x1005;</i>  当前支付环境安全,请放心使用!</span>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 130px">支付密码:</label>
+                                <div class="layui-input-inline">
+                                    <div class="pwd-box">
+                                        <input type="password" name="pass" class="pwd-input layui-input"
+                                               lay-vertype="tips"
+                                               lay-verify="required" id="pwd-input">
+
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block" style="margin-left: 159px;color: #6d6d6d">
+                                        请输入支付密码(账号登录密码)
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block" style="margin-left: 159px;">
+                                        <button type="button" class="layui-btn " lay-submit="" lay-filter="submit"
+                                                style="background: #da697d;">立即支付
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'jquery', 'layer', 'form'], function () {
+        var mm = layui.mm,
+            layer = layui.layer,
+            form = layui.form,
+            $ = layui.$;
+        var orderIds = [[${orderIds}]]
+        $('.bank').on('click', function () {
+            $('.bank').css('border', '0px')
+            $(this).css('border', ' 2px ridge #da697d')
+        })
+        // var $input = $(".fake-box input");
+        // $("#pwd-input").on("input", function () {
+        //     var pwd = $(this).val().trim();
+        //     for (var i = 0, len = pwd.length; i < len; i++) {
+        //         $input.eq("" + i + "").val(pwd[i]);
+        //     }
+        //     $input.each(function () {
+        //         var index = $(this).index();
+        //         if (index >= len) {
+        //             $(this).val("");
+        //         }
+        //     });
+        //     if (len == 6) {
+        //         //执行其他操作
+        //     }
+        // });
+        //立即支付
+        form.on('submit(submit)', function (form) {
+            $.ajax({
+                url: '/order/toPay.do',
+                type: 'post',
+                data: {'orderIds': orderIds, "pass": form.field.pass},
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        //支付成功跳转页面到支付成功页面
+                        location.href = '/paySuccess'
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+</body>
+</html>

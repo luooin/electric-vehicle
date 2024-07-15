@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}"></title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" charset="UTF-8" href="/resource/css/reset.css">
+    <link rel="stylesheet" charset="utf-8" href="/resource/css/web_pop.css">
+    <link rel="stylesheet" charset="UTF-8" href="/resource/css/login.css">
+</head>
+<body>
+<div class="register_header">
+    <div class="header_center clearfix">
+        <div class="myfl">
+            <a href="/diplomaProject">
+                <small th:text="${wbeParameter.name}"
+                       style="color: #cfb2f6;font-size: 22px;font-weight: 600;font-family: Symbol"></small>
+            </a>
+            <span>找回密码</span>
+        </div>
+        <div class="myfr">
+            <a href="/diplomaProject">返回首页</a>
+        </div>
+    </div>
+</div>
+<div class="register_content clearfix"
+     style="background:url('/resource/image/user_register_bag.jpg') no-repeat 0 90px;height: 500px">
+    <div class="layui-form">
+        <div class="register_box myfr">
+            <div class="title clearfix">
+                <span class="myfl"></span>
+                <h1 class="myfl">找回密码</h1>
+                <span class="myfr"></span>
+            </div>
+            <small style="margin-top: 10px;">输入您的电子邮件地址，您的密码将重置并通过电子邮件发送给您邮件账户。</small>
+            <input type="text" placeholder="请输入您的用户名" name="userName" lay-verify="required|userName"
+                   lay-vertype="tips" autocomplete="off"/>
+            <input type="text" style="color: #666;" placeholder="请输入您的电子邮件" id="toEmail" name="toEmail"
+                   lay-verify="required|email" lay-vertype="tips" autocomplete="off"/>
+            <a href="javascript:;" class="submit_btn" type="submit" lay-submit="" lay-filter="Submit">立即发送</a>
+        </div>
+    </div>
+</div>
+<!--<div class="register_bottom">Copright &nbsp;&nbsp;<span th:text="${wbeParameter.name}"></span> &nbsp;&nbsp;版权所有</div>-->
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['table', 'layer', 'laydate', 'upload', 'form'], function () {
+        var table = layui.table,
+            $ = layui.$,
+            layer = layui.layer,
+            upload = layui.upload,
+            form = layui.form;
+        form.on('submit(Submit)', function (data) {
+            $.ajax({
+                url: '/retrievePass',
+                type: 'post',
+                data: data.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        layer.msg("密码已发送至邮箱!", {time: 2000});
+                        $('#toEmail').val("")
+                        $('#userName').val("")
+                    }
+                }
+
+            });
+        });
+    });
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

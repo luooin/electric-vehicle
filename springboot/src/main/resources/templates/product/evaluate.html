@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<style>
+    .layui-form-label {
+        width: 90px;
+    }
+
+    div.layui-input-inline {
+        display: inline-block;
+    }
+
+    .layui-input-inline {
+        position: relative;
+    }
+
+    .layui-input-inline > input {
+        padding-left: 6px;
+        padding-right: 24px;
+    }
+
+    .layui-input-inline > [class*="layui-icon-"] {
+        padding: 0 3px;
+        z-index: 999;
+        position: absolute;
+        top: 3px;
+        bottom: 1px;
+        right: 3px;
+        line-height: 28px;
+        display: inline-block;
+        color: #909090;
+        font-size: 16px;
+    }
+</style>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <table class="layui-hide" id="table-list"></table>
+</div>
+
+
+<script type="text/html" id="column-toolbar">
+    <!--<button type="button" class="layui-btn layui-btn-normal  layui-btn-xs" lay-event="edit">-->
+    <!--<i class="layui-icon layui-icon-dialogue" title="回复"></i>-->
+    <!--回复-->
+    <!--</button>-->
+    <button type="button" class="layui-btn layui-btn-danger  layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title=""></i>
+        删除
+    </button>
+</script>
+<script type="text/html" id="urlTpl">
+    <span style="cursor: pointer;color: #1E9FFF"><i class="layui-icon layui-icon-picture"></i>点击查看</span>
+</script>
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script th:inline="javascript">
+    var productId = [[${productId}]]
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'dtree', 'laydate', 'form', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var dtree = layui.dtree;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        table.render({
+            elem: '#table-list',
+            url: '/product/evaluateTable.do',
+            cellMinWidth: 80,
+            page: true,
+            skin: 'nob',
+            // toolbar: '#toolbar',
+            where: {'productId': productId},
+            smartReloadModel: true,
+            cols: [
+                [
+                    {field: 'userName', title: '评论用户', width: 120},
+                    {field: 'content', title: '评论内容'},
+                    {field: 'grade', title: '评分', width: 100},
+                    {field: 'img', title: '图片', width: 120, align: 'center', templet: "#urlTpl", event: "upImg"},
+                    {field: 'time', title: '日期', width: 120,},
+                    {title: '操作', fixed: 'right', width: 160, align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ]
+        });
+
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'upImg') {
+                var imgs = eval('(' + data.imgs + ')');
+                var data = [];
+                for (item in imgs) {
+                    var obj = {};
+                    obj.src = imgs[item];
+                    data.push(obj);
+                }
+                console.log(data)
+                layer.photos({
+                    photos: {
+                        "title": "查看大图", //相册标题
+                        "start": 0, //初始显示的图片序号，默认0
+                        "data": data
+                    }
+                    , anim: 2//0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                });
+            } else if (event === 'edit') {
+                layer.open({
+                    content: "/product/editEvaluatePage.do?id=" + data.id,
+                    title: "回复",
+                    area: ['60%', '60%'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            } else if (event === 'del') {
+                layer.confirm("确定删除吗?", {icon: 3, title: '提示'},
+                    function (index) {// 确定回调
+                        $.ajax({
+                            url: "/evaluate/evaluate.do",
+                            type: "post",
+                            data: {_method: "DELETE", "ids": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('table-list');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {//取消回调
+                        layer.close(index);
+                    }
+                );
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

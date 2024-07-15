@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}"></title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" charset="utf-8" href="/resource/css/reset.css">
+    <link rel="stylesheet" charset="utf-8" href="/resource/css/reg.css">
+</head>
+<body>
+<div class="login_header">
+    <div class="header_center clearfix">
+        <div class="myfl">
+            <a href="/diplomaProject" th:text="${wbeParameter.name}"
+               style="font-weight: bold;font-size: 25px;color: #da697d"></a>
+            <span>欢迎登陆</span>
+        </div>
+        <div class="myfr">
+            <a href="/diplomaProject">返回首页</a><span></span><a href="/backstageLogin" class="collection_web">管理系统</a>
+        </div>
+    </div>
+</div>
+<div class="login_content clearfix">
+    <div class="layui-form">
+        <div class="login_box myfr">
+            <p class="tabchange clearfix">
+                <span class="myfl sign_select" id="usertype">用户登录</span>
+            </p>
+            <p class="system_error"></p>
+            <input type="text" name="userName" lay-verify="required|userName" lay-vertype="tips" autocomplete="off"
+                   placeholder="用户名">
+            <p class="username_error"></p>
+            <input type="password" value="" placeholder="登录密码" name="password" lay-verify="required|pass"
+                   lay-vertype="tips"
+                   autocomplete="off">
+            <p class="password_error"></p>
+            <p class="forget_password clearfix"><a href="/forgetPas" class="myfr">忘记密码？</a></p>
+            <input type="submit" lay-submit="" lay-filter="demo1" value="立即登录" class="submit_btn">
+            <p class="entry_mode clearfix">
+                <span class="myfl">还没有账号?快去注册一个</span>
+                <a href="/prosceniumReg" class="myfr">
+                    <em></em>
+                    <i>快速注册</i>
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+<!--<div class="login_bottom">Copright <span th:text="${wbeParameter.name}"></span> 版权所有 &copy;</div>-->
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['carousel', 'form'], function () {
+        var carousel = layui.carousel
+            , form = layui.form,
+            $ = layui.$;
+        //自定义验证规则
+        form.verify({
+            userName: function (value) {
+                if (value.length < 5) {
+                    return '账号至少得5个字符';
+                }
+            }
+            , pass: [/^[\S]{5,12}$/, '密码必须5到12位，且不能出现空格']
+        });
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            $.ajax({
+                url: '/loginPro.do',
+                type: 'post',
+                dataType: 'json',
+                data: data.field,
+                async: false,
+                success: function (result) {
+                    console.log(result)
+                    if (result.status) {
+                        location.href = "/diplomaProject";
+                    } else {
+                        layer.msg(result.msg, {time: 3000});
+                    }
+                }
+
+            });
+        });
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

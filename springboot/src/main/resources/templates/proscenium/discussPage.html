@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}"</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <!-- layui样式 -->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base information-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="info-list-box" style="background: url('/resource/image/webImg2.jpeg ');background-size: 100% 100%">
+        <div class="info-list w1200">
+            <div class="item-box layui-clear" id="list-cont">
+                <div class="layui-card" style="padding: 20px">
+                    <section class="msg-remark" style="text-align: center;padding: 40px;line-height: 40px">
+                        <h1 style="font-weight: bold">留言板</h1>
+                        <p style="font-size: 20px">
+                            沟通交流，拉近你我！
+                        </p>
+                    </section>
+                    <div class="layui-form">
+                              <textarea class="layui-textarea layui-hide" name="content"
+                                        lay-verify="content"
+                                        id="LAY_demo_editor"></textarea>
+                        <button class="layui-btn" style="background-color: #da697d;margin-top: 10px" lay-submit=""
+                                lay-filter="leave">提交
+                        </button>
+                    </div>
+                </div>
+                <div class="layui-card">
+
+                    <div class="layui-card-body datails-content">
+
+
+                        <div class="layui-row evaluate-list" th:each="leave:${leaveList}">
+                            <div class="layui-col-md1">
+                                <img class="userImg" th:src="${leave.userImg}">
+                            </div>
+                            <div class="layui-col-md11" style="margin-left: -40px">
+                                <p>
+                                    <span class="userName" th:text="${leave.userName}"></span>
+                                    <span class="time"
+                                          th:text="${#strings.substring(leave.time,0,11)}"></span>
+                                </p>
+                                <p class="evaluate-content" th:utext="${leave.content}"></p>
+                                <p class="icon-button" style="color: #8C8C8C;font-size: 13px;text-align: right">
+                                    <span>展开</span><i class="layui-icon layui-icon-triangle-d"></i></p>
+                                <div class="reply-main" style="display: none">
+                                    <div class="reply-list layui-row" th:each="reply:${leave.replyList}">
+                                        <div class="layui-col-md1">
+                                            <img class="userImg" th:src="${reply.userImg}">
+                                        </div>
+                                        <div class="layui-col-md8" style="margin-left: -40px">
+                                            <p>
+                                                <span class="userName"
+                                                      th:text="${reply.userName}"></span><span
+                                                    style="color: #da697d;font-size: 13px"> 回复说:</span>
+                                                <span class="time"
+                                                      th:text="${#strings.substring(reply.time,0,11)}"></span>
+                                            </p>
+                                            <p class="reply-content" th:utext="${reply.content}"></p>
+                                        </div>
+                                    </div>
+                                    <!--<div class="layui-form">-->
+                                    <!--<textarea class="layui-textarea" name="content" lay-verify="content"></textarea>-->
+                                    <!--<input hidden name="leaveId" th:value="${leave.id}">-->
+                                    <!--<button class="layui-btn" style="background-color: #da697d" lay-submit=""-->
+                                    <!--lay-filter="reply">提交回复-->
+                                    <!--</button>-->
+                                    <!--</div>-->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['jquery', 'layer', 'layedit', 'form'], function () {
+        var jquery = layui.jquery,
+            layer = layui.layer,
+            form = layui.form,
+            layedit = layui.layedit,
+            $ = layui.$;
+        $('.icon-button').on('click', function () {
+            var cont = $($(this).find('span')).text();
+            if (cont == '展开') {
+                $($(this).find('span')).text('收起')
+                $($(this).find('i')).attr('class', 'layui-icon layui-icon-triangle-r')
+                $($(this).siblings('.reply-main')).css('display', 'block')
+            } else if (cont == '收起') {
+                $($(this).find('span')).text('展开')
+                $($(this).find('i')).attr('class', 'layui-icon layui-icon-triangle-d')
+                $($(this).siblings('.reply-main')).css('display', 'none')
+            }
+        })
+        layedit.set({
+            height: 150,
+            tool: ['face', '|', 'link'],
+        });
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+        form.on('submit(reply)', function (form) {
+            $.ajax({
+                url: '/leave/reply.do',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        layer.msg("回复成功!", {
+                            icon: 6, time: 1000, end: function () {
+                                location.reload()
+                            }
+                        })
+                    }
+                }
+
+            });
+        });
+        form.on('submit(leave)', function (form) {
+            form.field.content = layedit.getContent(editIndex)
+            $.ajax({
+                url: '/leave/leave.do',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        layer.msg("提交成功!", {
+                            icon: 6, time: 1000, end: function () {
+                                location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+
+
+</body>
+</html>

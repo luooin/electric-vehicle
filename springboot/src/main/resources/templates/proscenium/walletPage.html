@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css" media="all"/>
+</head>
+<style>
+    .layui-form-label {
+        width: 60px;
+    }
+
+    .layui-form-select dl {
+        z-index: 99999;
+    }
+
+    input::-webkit-input-placeholder {
+        color: #d2d2d2;
+    }
+
+    input::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color: #d2d2d2;
+    }
+
+    input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color: #d2d2d2;
+    }
+
+    input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #d2d2d2;
+    }
+
+    .layui-input-block {
+        width: 60%;
+        margin-left: 90px;
+    }
+
+    .layui-input, .layui-select, .layui-textarea {
+        height: 30px;
+    }
+
+    .layui-input-inline {
+        width: 50%;
+    }
+</style>
+<body>
+<div class="yadmin-body animated fadeIn" style="padding: 40px">
+    <div class="layui-form">
+        <p style="font-weight: bold;color: red;text-align: center;font-size: 20px">充值金额:<span th:text="${price}"></span>
+        </p>
+        <p style="text-align: center;color: #777777;padding: 5px">请扫下方二维码进行支付</p>
+        <div class="layui-form-item" style="text-align: center;margin-top: 20px">
+            <img src="/resource/image/ho.png" style="width: 200px">
+        </div>
+        <input type="hidden" th:value="${price}" name="price">
+        <input type="hidden" th:value="${newPas}" name="newPas">
+        <div class="layui-form-item" style="position: fixed;bottom: 0px;right: 10px">
+            <div class="layui-input-block" style="width: 70%">
+                <button class="layui-btn layui-btn-normal " lay-submit="" lay-filter="add">已支付
+                </button>
+                <button type="" class="layui-btn layui-btn-primary  close">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script th:inline="javascript">
+
+    layui.use(['form', 'layer', 'upload', 'layedit'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , upload = layui.upload;
+        $('.close').on('click', function () {
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        })
+        form.on('submit(add)', function (form) {
+            $.ajax({
+                url: '/recharge',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        layer.msg("充值成功!", {
+                            icon: 6, time: 1000, end: function () {
+                                parent.location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        });
+
+    });
+</script>
+
+</body>
+</html>

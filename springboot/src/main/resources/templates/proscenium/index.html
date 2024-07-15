@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/base.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/media_index.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/mod.css">
+    <!-- layui样式 -->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body id="list-cont">
+<div th:replace="proscenium/public :: head"></div>
+
+<div class="content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="wraper">
+
+        <section id="main" class="site-main clear_bottom">
+            <aside class="main-left">
+                <ul class="category-list">
+                    <li th:each="category,str:${categoryList}"
+                        th:if="${str.index lt 9}">
+                        <a style="color: white" th:href="${'/productList?categoryId='+category.id}">
+                            <img src="/resource/image/vip.png"
+                                 style="width: 20px;position:absolute;left: 90px;"
+                                 th:if="${category.rank eq'是'}">
+                            <p style="font-weight: bold"><span th:text="${category.name}"></span>
+                                <em style="float: right" class="layui-icon layui-icon-right"></em></p>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <section class="main-right">
+                <div class="slider">
+                    <div class="layui-carousel" id="bannerDiv">
+                        <div carousel-item>
+                            <div th:each="slideshow:${slideshowList}">
+                                <a th:href="${'/productDetails?id='+slideshow.productId}">
+                                    <img th:src="${slideshow.url}" style="width: 100%;height: 100%">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-panel" style="padding: 5px">
+                    <marquee direction="up" scrollamount="1px" height="30px">
+                        <p style="margin-bottom: 10px;color: #B0B0B0" th:each="notice:${noticeList}"><a
+                                style="color: #da697d"
+                                th:href="${'/noticeDetailsPage?id='+notice.id}"
+                                th:text="${notice.title}"></a>
+                            <span style="float: right" th:text="${#strings.substring(notice.time,0,19)}"></span>
+                        </p>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--新品推荐-->
+    <section id="sku" class="wraper m-box mi-sku">
+        <input type="radio" id="sku-s1" class="sku-switch s1" name="sku-switch" hidden checked>
+        <input type="radio" id="sku-s2" class="sku-switch s2" name="sku-switch" hidden>
+        <header class="m-hd">
+            <h2 class="m-hdL" style="font-size: 20px;color: #da697d">最新上架</h2>
+            <div class="m-hdR">
+                <div class=" btns2">
+                    <a href="#" class="btn btn1 active"><label for="sku-s1">&lt;</label></a>
+                    <a href="#" class="btn btn2"><label for="sku-s2">&gt;</label></a>
+                </div>
+            </div>
+        </header>
+        <div class="m-box">
+            <section class="span20 m-slide">
+                <div class="m-slide-contain m-s2">
+                    <div class="m-slide-item">
+                        <ul class="m-cols m-col-5">
+                            <li class="col sku-item" th:each="newProduct,str:${newProductList}"
+                                th:if="${str.index lt  5}">
+                                <dl class="row">
+                                    <a th:href="${'/productDetails?id='+newProduct.id}">
+                                        <dt><img th:src="${newProduct.img}"></dt>
+                                        <dd class="name" th:text="${newProduct.name}"></dd>
+                                        <dd class="desc" th:text="${newProduct.specification}"></dd>
+                                        <dd class="price" th:text="${'￥'+newProduct.disPrice+'元'}">1499</dd>
+                                    </a>
+                                </dl>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="m-slide-item">
+                        <ul class="m-cols m-col-5">
+                            <li class="col sku-item" th:each="newProduct,str:${newProductList}"
+                                th:if="${str.index lt 10 && str.index ge 5}">
+                                <dl class="row">
+                                    <a th:href="${'/productDetails?id='+newProduct.id}">
+                                        <dt><img th:src="${newProduct.img}"></dt>
+                                        <dd class="name" th:text="${newProduct.name}"></dd>
+                                        <dd class="desc" th:text="${newProduct.specification}"></dd>
+                                        <dd class="price" th:text="${'￥'+newProduct.disPrice+'元'}">1499</dd>
+                                    </a>
+                                </dl>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <div class="gray-section" style="background: url('/resource/image/webImg2.jpeg ');background-size: 100% 100%">
+        <section class="wraper mi-hard clear_bottom" id="hard">
+            <header class="m-hd" style="margin-left: 5px">
+                <h2 class="m-hdL" style="font-size: 20px;color: #da697d">收藏推荐</h2>
+            </header>
+            <section class="m-box line2">
+                <div>
+                    <ul class="m-cols m-col-5" th:each="saleProduct:${saleProductList}">
+                        <li class="col" style="padding: 5px">
+                            <div class="row" style="padding: 10px">
+                                <dl>
+                                    <a th:href="${'/productDetails?id='+saleProduct.id}">
+                                        <dt><img th:src="${saleProduct.img}"></dt>
+                                        <dd class="name"
+                                            style="height: 22px; overflow: hidden; display: -webkit-box;   -webkit-line-clamp: 1; -webkit-box-orient: vertical; "
+                                            th:text="${saleProduct.name}"></dd>
+                                        <dd class="desc"
+                                            style="height: 19px; overflow: hidden; display: -webkit-box;   -webkit-line-clamp: 1; -webkit-box-orient: vertical; "
+                                            th:text="${saleProduct.specification}"></dd>
+                                        <dd class="price" th:text="${saleProduct.disPrice+'元'}"></dd>
+                                    </a>
+                                </dl>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </section>
+
+
+        <!--<section class="wraper mi-content" id="content">-->
+        <!--<header class="m-hd">-->
+        <!--<h2 class="m-hdL">内容</h2>-->
+        <!--<ul class="m-hdR">-->
+        <!--<li></li>-->
+        <!--</ul>-->
+        <!--</header>-->
+        <!--<section class="m-box">-->
+        <!--<ul class="m-cols m-col-4">-->
+        <!--<li class="col orange">-->
+        <!--<div class="row">-->
+        <!--<dl>-->
+        <!--<dt class="type">图书</dt>-->
+        <!--<dd class="name">哈利波特与魔法石</dd>-->
+        <!--<dd class="desc">哈利波特来了</dd>-->
+        <!--<dd class="status"></dd>-->
+        <!--<dd><img src="./images/content/content1.png"></dd>-->
+        <!--</dl>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="col green">-->
+        <!--<div class="row">-->
+        <!--<dl>-->
+        <!--<dt class="type">图书</dt>-->
+        <!--<dd class="name">哈利波特与魔法石</dd>-->
+        <!--<dd class="desc">哈利波特来了</dd>-->
+        <!--<dd class="status"></dd>-->
+        <!--<dd><img src="./images/content/content2.jpg"></dd>-->
+        <!--</dl>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="col red">-->
+        <!--<div class="row">-->
+        <!--<dl>-->
+        <!--<dt class="type">图书</dt>-->
+        <!--<dd class="name">哈利波特与魔法石</dd>-->
+        <!--<dd class="desc">哈利波特来了</dd>-->
+        <!--<dd class="status"></dd>-->
+        <!--<dd><img src="./images/content/content3.png"></dd>-->
+        <!--</dl>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="col blue">-->
+        <!--<div class="row">-->
+        <!--<dl>-->
+        <!--<dt class="type">图书</dt>-->
+        <!--<dd class="name">哈利波特与魔法石</dd>-->
+        <!--<dd class="desc">哈利波特来了</dd>-->
+        <!--<dd class="status"></dd>-->
+        <!--<dd><img src="./images/content/content4.png"></dd>-->
+        <!--</dl>-->
+        <!--</div>-->
+        <!--</li>-->
+
+        <!--</ul>-->
+        <!--</section>-->
+        <!--</section>-->
+        <!--<section class="wraper mi-video clear_bottom" id="video">-->
+        <!--<input type="checkbox" id="video-switch" name="video-switch" class="video-switch" hidden>-->
+        <!--<div class="video-mask">-->
+        <!--<label for="video-switch" class="close-btn"></label>-->
+        <!--<video controls src="./video/1.mp4"></video>-->
+        <!--</div>-->
+        <!--<header class="m-hd">-->
+        <!--<h2 class="m-hdL">视频</h2>-->
+        <!--<ul class="m-hdR">-->
+        <!--<div class="scan">-->
+        <!--<span>查看全部</span>-->
+        <!--<a href="#" class="icon">&gt;</a>-->
+        <!--</div>-->
+        <!--</ul>-->
+        <!--</header>-->
+        <!--<section class="m-box">-->
+        <!--<ul class="m-cols m-col-4">-->
+        <!--<li class="col">-->
+        <!--<div class="row">-->
+        <!--<div class="video">-->
+        <!--<label class="play-btn" for="video-switch"></label>-->
+        <!--<img src="./images/video/video1.jpg">-->
+        <!--</div>-->
+        <!--<div class="content">-->
+        <!--<p class="name"><a href="#">红米年度品牌视频</a></p>-->
+        <!--<p class="desc">一亿人喜爱你，是一种责任</p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="col">-->
+        <!--<div class="row">-->
+        <!--<div class="video">-->
+        <!--<label class="play-btn" for="video-switch"></label>-->
+        <!--<img src="./images/video/video2.jpg">-->
+        <!--</div>-->
+        <!--<div class="content">-->
+        <!--<p class="name"><a href="#">红米年度品牌视频</a></p>-->
+        <!--<p class="desc">一亿人喜爱你，是一种责任</p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="col">-->
+        <!--<div class="row">-->
+        <!--<div class="video">-->
+        <!--<label class="play-btn" for="video-switch"></label>-->
+        <!--<img src="./images/video/video3.jpg">-->
+        <!--</div>-->
+        <!--<div class="content">-->
+        <!--<p class="name"><a href="#">红米年度品牌视频</a></p>-->
+        <!--<p class="desc">一亿人喜爱你，是一种责任</p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="col">-->
+        <!--<div class="row">-->
+        <!--<div class="video">-->
+        <!--<label class="play-btn" for="video-switch"></label>-->
+        <!--<img src="./images/video/video4.jpg">-->
+        <!--</div>-->
+        <!--<div class="content">-->
+        <!--<p class="name"><a href="#">红米年度品牌视频</a></p>-->
+        <!--<p class="desc">一亿人喜爱你，是一种责任</p>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--</ul>-->
+        <!--</section>-->
+        <!--</section>-->
+    </div>
+    <!--<div style="background:  #da697d" class="product-list-box" id="product-list-box">-->
+    <!--<div class="product-list-cont w1200">-->
+    <!--<h4 style="color: white">猜你喜欢</h4>-->
+    <!--<div class="product-item-box layui-clear">-->
+    <!--<div class="list-item" th:each="product:${productList}">-->
+    <!--<a th:href="${'/productDetails?id='+product.id}">-->
+    <!--<img th:src="${product.img}" style="width: 190px;height: 160px"></a>-->
+    <!--<p th:text="${product.name}"-->
+    <!--style=" overflow: hidden; display: -webkit-box;   -webkit-line-clamp: 2; -webkit-box-orient: vertical; "></p>-->
+    <!--<span th:text="${'￥'+product.disPrice}">￥100.00</span>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+</div>
+
+<div class="footer" th:replace="proscenium/public :: footer">
+</div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script type="text/javascript">
+
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'carousel'], function () {
+        var carousel = layui.carousel,
+            mm = layui.mm;
+        var option = {
+            elem: '#test1'
+            , width: '100%' //设置容器宽度
+            , arrow: 'always'
+            , height: '298'
+            , indicator: 'none'
+        }
+        var option2 = {
+            elem: '#bannerDiv'
+            , width: '100%' //设置容器宽度
+            , arrow: 'none'
+            , height: '400'
+
+        }
+        carousel.render(option);
+        carousel.render(option2);
+    });
+</script>
+</body>
+</html>

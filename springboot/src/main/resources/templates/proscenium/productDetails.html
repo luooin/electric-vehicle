@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<style>
+    .layui-tab-brief > .layui-tab-title .layui-this {
+        color: #da697d !important;
+    }
+
+    .layui-tab-brief > .layui-tab-more li.layui-this:after, .layui-tab-brief > .layui-tab-title .layui-this:after {
+        border-bottom: 2px solid #da697d !important;
+    }
+
+    .reply-content {
+        padding: 0px 20px 10px 70px;
+        font-size: 13px;
+
+    }
+</style>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base datails-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="data-cont-wrap w1200">
+        <div class="crumb">
+            <a href="javascript:;">首页</a>
+            <span>></span>
+            <a href="javascript:;" th:text="${category.name}">所有车辆</a>
+            <span>></span>
+            <a href="javascript:;" th:text="${sonCategory.name}">产品详情</a>
+        </div>
+        <div class="product-intro layui-clear">
+            <div class="preview-wrap">
+                <a href="javascript:;"><img th:src="${product.img}" style="width: 402px;height: 402px">
+                    <img src="/resource/image/vip.png" th:if="${product.rank eq'是'}"
+                         style="width: 40px;position:absolute;left: 350px;"></a>
+            </div>
+            <div class="itemInfo-wrap">
+                <div class="itemInfo">
+                    <div class="title">
+                        <h4 th:text="${product.name}"></h4>
+                        <span class="collect-product" th:if="${!isCollect}">
+                            <i style="color: #777777" class="layui-icon layui-icon-rate-solid"></i>收藏</span>
+                        <span class="collect-product" th:if="${isCollect}">
+                            <i class="layui-icon layui-icon-rate-solid"></i>
+                            已收藏</span>
+                    </div>
+                    <div class="summary" style="height: auto">
+                        <p class="reference"><span>剩余数量</span>
+                            <s th:text="${product.inventory}"></s>
+ pan                       </p>
+                        <p class="activity"><span>租金价格</span><strong class="price"><i>￥</i><span
+                                th:text="${product.disPrice}"></span></strong></p>
+                        <p class="address-box"><span>规格参数</span>
+                            <strong class="address" th:text="${product.specification}"></strong>
+                        </p>
+                        <p class="address-box"><span>出租用户</span>
+                            <strong class="address" th:text="${sellerName}"></strong>
+                        </p>
+                    </div>
+                    <div class="choose-attrs">
+                        <div class="number layui-clear">
+                            <span class="title">天&nbsp;&nbsp;&nbsp;&nbsp;数</span>
+                            <div class="number-cont">
+                                <span class="cut btn">-</span>
+                                <input onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                       onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                       maxlength="4" type="" name="" value="1">
+                                <span class="add btn">+</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="choose-btns" th:if="${isGogin}">
+                        <button class="layui-btn layui-btn-primary purchase-btn" th:if="${!isMy}">
+                            立即租赁
+                        </button>
+
+                        <span class="send-message" style="color:#cfb2f6;cursor: pointer;margin-left: 10px ">举报</span>
+                    </div>
+                    <div class="choose-btns" th:if="${!isGogin}">
+                        <a style="color: #cfb2f6" href="/">请先登录!</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-clear layui-row">
+            <div class="aside layui-col-md4" style="width: 30%">
+                <h4>推荐</h4>
+                <div class="item-list">
+                    <div class="item" th:each="saleProduct:${saleProductList}">
+                        <a th:href="${'/productDetails?id='+saleProduct.id}">
+                            <img th:src="${saleProduct.img}" style="width: 280px;height: 280px"></a>
+                        <p style="line-height: 30px"><span th:text="${saleProduct.name}"
+                                                           style=" overflow: hidden;text-overflow: ellipsis;-o-text-overflow: ellipsis;white-space:nowrap;width:280px;display:block;"></span>
+                            <span class="pric" th:text="${'￥'+saleProduct.disPrice}">99.00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class=" layui-col-md7" style="margin-left: 80px">
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">车辆详情</li>
+                        <li>评价</li>
+                    </ul>
+                    <div class="layui-tab-content">
+                        <div class="layui-tab-item layui-show" style="padding-left: 0px" th:utext="${product.content}">
+
+                        </div>
+                        <div class="layui-tab-item" style="padding: 20px; background-color: #F2F2F2;">
+                            <div class="layui-card">
+                                <div class="layui-card-body" style="line-height: 40px;">
+                                    <p style="color: #da697d;font-size: 20px">好评率</p>
+                                    <p style="color: #da697d;font-size: 20px;font-weight: bold"
+                                       th:text="${applause+'%'}"></p>
+                                    <p>共有<span th:text="${evaluateListNum}"></span>人评论</p>
+                                </div>
+                            </div>
+                            <div class="layui-card">
+                                <div class="layui-card-body">
+                                    <div class=" evaluate-list" th:each="evaluate:${evaluateList}">
+                                        <div class="layui-row">
+                                            <div class="layui-col-md1">
+                                                <img class="userImg" th:src="${evaluate.userImg}">
+                                            </div>
+                                            <div class="layui-col-md8">
+                                                <p>
+                                                    <span class="userName" th:text="${evaluate.userName}"></span>
+                                                    <span class="time"
+                                                          th:text="${#strings.substring(evaluate.time,0,11)}"></span>
+                                                </p>
+                                                <p class="evaluate-content" th:text="${evaluate.content}"></p>
+                                                <p class="evaluate-imgs">
+                                                    <img class="evaluate-img" th:each="img:${evaluate.imgList}"
+                                                         th:src="${img}">
+                                                </p>
+                                            </div>
+                                            <div class="layui-col-md3" style="padding-left: 10px">
+                                                <div th:id="${evaluate.id}"></div>
+                                            </div>
+                                        </div>
+                                        <div class="reply" th:if="${evaluate.reply !=null && evaluate.reply!=''}"
+                                             style="margin: 20px 0px 0px 50px;padding-top: 10px;  background-color: #f5f5f5;width: 89%">
+                                            <p style="color: #da697d;font-size: 13px;padding-left: 12px">卖家回复:</p>
+                                            <p class="reply-content" th:text="${evaluate.reply}"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    var productId = [[${product.id}]]
+    var evaluateList = [[${evaluateList}]]
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'jquery', 'layer', 'rate'], function () {
+        var mm = layui.mm, layer = layui.layer, $ = layui.$, rate = layui.rate;
+        for (item in evaluateList) {
+            loadGrade(evaluateList[item].id, evaluateList[item].grade)
+        }
+
+        function loadGrade(id, grade) {
+            rate.render({
+                elem: '#' + id
+                , value: grade
+                , text: true
+                , readonly: true
+                , setText: function (value) { //自定义文本的回调
+                    console.log(value)
+                    var arrs = {
+                        '1': '极差'
+                        , '2': '差'
+                        , '3': '中等'
+                        , '4': '好'
+                        , '5': '极好'
+                    };
+                    this.span.text(arrs[value] || (value + "星"));
+                }
+            })
+        }
+
+        //收藏
+        $('.collect-product').on('click', function () {
+            $.ajax({
+                url: '/product/collect.do',
+                type: 'post',
+                data: {'productId': productId},
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {icon: 5});
+                        return false;
+                    } else {
+                        layer.msg(result.msg, {
+                            icon: 6, time: 1000, end: function () {
+                                location.reload()
+                            }
+                        })
+                    }
+                }
+            });
+        })
+        //查看评价图片
+        $('.evaluate-img').on('click', function () {
+            layer.photos({
+                photos: {
+                    "title": "查看大图", //相册标题
+                    "start": 0, //初始显示的图片序号，默认0
+                    "data": [   //相册包含的图片，数组格式
+                        {
+                            "src": $(this).attr('src'), //原图地址
+                            "thumb": "" //缩略图地址
+                        }
+                    ]
+                }
+                , anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+            });
+        })
+        var cur = $('.number-cont input').val();
+        $('.number-cont .btn').on('click', function () {
+            if ($(this).hasClass('add')) {
+                cur++;
+
+            } else {
+                if (cur > 1) {
+                    cur--;
+                }
+            }
+            $('.number-cont input').val(cur)
+        })
+        $('.send-message').on('click', function () {
+            layer.open({
+                content: "/abnormal/reportPage.do?productId=" + productId,
+                title: "违规举报",
+                area: ['60%', '70%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true
+            });
+        })
+        //立刻租赁操作
+        //立刻购买操作
+        $('.purchase-btn').on('click', function () {
+            //数量
+            var num = $('.number-cont input').val();
+            //首先验证商品库存是否足够
+            $.ajax({
+                url: '/product/haveStock.do',
+                type: 'post',
+                data: {'productId': productId},
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {icon: 5});
+                        return false;
+                    } else {
+                        //足够则进行提交订单页面跳转操作
+                        var submitOrderVo = [];
+                        var obje = {};
+                        obje.productId = productId;
+                        obje.num = num;
+                        submitOrderVo.push(obje)
+                        $.ajax({
+                            url: '/setBuySession',
+                            type: 'post',
+                            data: {'paramText': JSON.stringify(submitOrderVo).toString()},
+                            dataType: 'json',
+                            async: false,
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {icon: 5});
+                                    return false;
+                                } else {
+                                    window.location.href = '/submitOrder';
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        })
+    });
+</script>
+
+
+</body>
+</html>

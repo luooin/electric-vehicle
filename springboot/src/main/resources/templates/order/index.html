@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<style>
+    .layui-form-label {
+        width: 90px;
+    }
+
+    div.layui-input-inline {
+        display: inline-block;
+    }
+
+    .layui-input-inline {
+        position: relative;
+    }
+
+    .layui-input-inline > input {
+        padding-left: 6px;
+        padding-right: 24px;
+    }
+
+    .layui-input-inline > [class*="layui-icon-"] {
+        padding: 0 3px;
+        z-index: 999;
+        position: absolute;
+        top: 3px;
+        bottom: 1px;
+        right: 3px;
+        line-height: 28px;
+        display: inline-block;
+        color: #909090;
+        font-size: 16px;
+    }
+</style>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <form class="layui-form yadmin-search-area input">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label for="productName" class="layui-form-label">车辆名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="productName" id="productName" autocomplete="off"
+                           id="name" class="layui-input">
+                </div>
+                <label for="uuId" class="layui-form-label">订单编号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="uuId" autocomplete="off"
+                           id="uuId" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label for="consigneeInfo" class="layui-form-label">收货人</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="consigneeInfo" id="consigneeInfo" autocomplete="off" class="layui-input">
+                    <i class="layui-icon layui-icon-date"></i>
+                </div>
+                <label for="time" class="layui-form-label">租赁日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="time" autocomplete="off"
+                           id="time" class="layui-input">
+                    <i class="layui-icon layui-icon-date"></i>
+                </div>
+                <button lay-submit="" lay-filter="search" class="layui-btn layui-btn-sm layui-btn-primary table-action">
+                    <i class="layui-icon layui-icon-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    <table class="layui-hide" id="table-list"></table>
+</div>
+<div class="viewDiv" style="display: none"></div>
+
+<script type="text/html" id="column-toolbar">
+    {{#  if(d.state=='1'){ }}
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="deliver">
+        <i class="layui-icon layui-icon-release" title="确认"></i>
+        确认
+    </button>
+
+    {{#  } }}
+    <button type="button" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="view">
+        <i class="layui-icon layui-icon-template-1" title="详情"></i>
+        详情
+    </button>
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title="删除"></i>
+        删除
+    </button>
+</script>
+<script type="text/html" id="stateTpl">
+    {{#  if(d.state=='0'){ }}
+    <button type="button" class="layui-btn  layui-btn-primary layui-btn-xs">
+        待付款
+    </button>
+    {{#  } else if(d.state=='1') { }}
+    <button type="button" class="layui-btn   layui-btn-xs">
+        待确认
+    </button>
+    {{#  } else if(d.state=='2') { }}
+    <button type="button" class="layui-btn   layui-btn-normal layui-btn-xs">
+        租赁中
+    </button>
+    {{#  } else if(d.state=='3') { }}
+    交易完成
+    {{#  } else if(d.state=='4') { }}
+    <button type="button" class="layui-btn   layui-btn-warm layui-btn-xs">
+        归还申请中
+    </button>
+    {{#  } else if(d.state=='5') { }}
+    已归还
+    {{#  } else if(d.state=='6') { }}
+    拒绝归还
+    {{#  } else if(d.state=='7') { }}
+    <span style="color: #FF5722"> 超时取消</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="urlTpl">
+    <span style="cursor: pointer;color: #1E9FFF"><i class="layui-icon layui-icon-picture"></i>点击查看</span>
+</script>
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script th:inline="javascript">
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'dtree', 'laydate', 'form', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var dtree = layui.dtree;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        form.on('submit(search)', function (form) {
+            table.reload('table-list', {
+                where: form.field
+            });
+            return false;
+        });
+        //日期选择器
+        laydate.render({
+            elem: '#time'
+            , theme: '#1E9FFF'
+        });
+        table.render({
+            elem: '#table-list',
+            url: '/order/order.do',
+            cellMinWidth: 80,
+            skin: 'nob',
+            page: true,
+            toolbar: '#toolbar',
+            smartReloadModel: true,
+            cols: [
+                [
+                    {field: 'uuId', title: '订单编号', width: 160},
+                    {field: 'saleUser', title: '下单用户', width: 120},
+                    {field: 'productName', title: '车辆名称'},
+                    {field: 'specification', title: '规格参数'},
+                    // {field: 'img', title: '图片', width: 120, align: 'center', templet: "#urlTpl", event: "upImg"},
+                    {field: 'unitPrice', title: '单价￥', width: 100},
+                    {field: 'num', title: '天数', width: 80},
+                    {field: 'leave', title: '备注'},
+                    {field: 'time', title: '租赁周期', width: 240},
+                    {field: 'state', title: '状态', align: 'center', templet: "#stateTpl", width: 100},
+                    {title: '操作', fixed: 'right', width: 310, align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ]
+        });
+
+
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'del') {
+                layer.confirm("确定删除吗?", {icon: 3, title: '提示'},
+                    function (index) {// 确定回调
+                        $.ajax({
+                            url: "/order/order.do",
+                            type: "post",
+                            data: {_method: "DELETE", "id": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('table-list');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {//取消回调
+                        layer.close(index);
+                    }
+                );
+            } else if (event === 'upImg') {
+                layer.photos({
+                    photos: {
+                        "title": "查看大图", //相册标题
+                        "start": 0, //初始显示的图片序号，默认0
+                        "data": [   //相册包含的图片，数组格式
+                            {
+                                "src": data.productImg, //原图地址
+                                "thumb": "" //缩略图地址
+                            }
+                        ]
+                    }
+                    , anim: 2//0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                });
+            } else if (event === 'deliver') {
+                editStatus(data.id, "2")
+            } else if (event === 'view') {
+                layer.open({
+                    content: "/order/detailsPage.do?id=" + data.id,
+                    title: "订单详情",
+                    area: ['80%', '90%'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            } else if (event === 'long') {
+                layer.open({
+                    content: "/order/longPage.do?id=" + data.id,
+                    title: "延期",
+                    area: ['400px', '450px'],
+                    type: 2,
+                    maxmin: true,
+                    shadeClose: true
+                });
+            }
+        });
+
+        //修改状态函数
+        function editStatus(id, state) {
+            $.ajax({
+                url: "/order/order.do",
+                type: "put",
+                data: {"id": id, 'state': state},
+                dataType: "json",
+                success: function (result) {
+                    if (!result.status) {
+                        layui.table.reload('table-list');
+                        return false;
+                    }
+                    layui.table.reload('table-list');
+                    return true
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

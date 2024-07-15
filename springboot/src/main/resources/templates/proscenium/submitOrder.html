@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<style>
+    .layui-tab-brief > .layui-tab-title .layui-this {
+        color: #da697d !important;
+    }
+
+    .layui-tab-brief > .layui-tab-more li.layui-this:after, .layui-tab-brief > .layui-tab-title .layui-this:after {
+        border-bottom: 2px solid #da697d !important;
+    }
+
+    .layui-card-header {
+        background: #f2f2f2;
+        border-bottom: 1px solid #DEDEDE !important;
+    }
+
+    .layui-card {
+        border-bottom: 1px solid #DEDEDE
+    }
+
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #da697d !important;
+    }
+
+    .title {
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .symbol {
+        color: #999;
+        font-size: 26px;
+    }
+
+    .price {
+        font-weight: bold;
+        color: #ff0036;
+        font-size: 26px;
+    }
+
+    .site {
+        color: #333333;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .consignee {
+        color: #333333;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .box-shadow {
+        border: 3px solid #da697d;
+        min-width: 230px;
+        padding: 10px 5px 10px 20px
+    }
+</style>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base datails-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="data-cont-wrap w1200 layui-form">
+        <div style="padding: 20px;">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">确认租赁人</div>
+                        <div class="layui-card-body" th:if="not ${#lists.isEmpty(addressList)}">
+                            <div th:each="address:${addressList}"
+                                 th:style="${address.isDefault eq '1'?'font-weight: bold':''}">
+                                <input type="radio" name="address" th:value="${address.id}" lay-filter="radio"
+                                       th:title="${address.site+'&nbsp;&nbsp;&nbsp;&nbsp;('+address.consignee+'  )&nbsp;&nbsp;&nbsp;&nbsp;'+address.phone}"
+                                       th:attr="checked=${address.isDefault eq '1'? true: false}">
+                            </div>
+                        </div>
+                        <div class="layui-card-body" th:if="  ${#lists.isEmpty(addressList)}">
+                            <a href="/address" style="color: #da697d">添加租赁人 ></a>
+                        </div>
+                    </div>
+                    <div class="layui-card">
+                        <table class="layui-table" lay-skin="line">
+                            <colgroup>
+                                <col width="300">
+                                <col width="400">
+                                <col width="100">
+                                <col width="100">
+                                <col width="100">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>车辆信息</th>
+                                <th>参数规格</th>
+                                <th>租金￥</th>
+                                <th>天数</th>
+                                <th>小计</th>
+                            </tr>
+                            </thead>
+                            <tbody th:each="submitOrderVo:${submitOrderVoList}">
+                            <tr>
+                                <td>
+                                    <input hidden name="productId" th:value="${submitOrderVo.productId}">
+                                    <input hidden name="num" th:value="${submitOrderVo.num}">
+                                    <div class="layui-row">
+                                        <div class="layui-col-md6"><img th:src="${submitOrderVo.img}"></div>
+                                        <div class="layui-col-md6"><p th:text="${submitOrderVo.productName}"></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><p th:text="${submitOrderVo.specification}"></p></td>
+                                <td><p th:text="${submitOrderVo.disPrice}"></p></td>
+                                <td><p th:text="${submitOrderVo.num}"></p></td>
+                                <td><p style="font-weight: bold;color: red"
+                                       th:text="${submitOrderVo.num*submitOrderVo.disPrice}"></p></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">给租赁方留言:</label>
+                                        <div class="layui-input-block">
+                                            <textarea placeholder="选填,请先和租赁方协商一致" id="leave" name="leave"
+                                                      class="layui-textarea"></textarea>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="layui-card">
+                        <div style="float: right;text-align: right">
+                            <div class="box-shadow">
+                                <div>
+                                    <p style="padding-bottom: 16px">
+                                        <span class="title">实付款:&nbsp;&nbsp;</span>
+                                        <span class="symbol">￥</span>
+                                        <span class="price" th:text="${zumPrice}"></span>
+                                    </p>
+                                </div>
+
+                            </div>
+                            <div>
+                                <button type="button" class="layui-btn " lay-submit="" lay-filter="submit"
+                                        style="background: #da697d;width: 200px">
+                                    提交订单
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'jquery', 'layer', 'form'], function () {
+        var mm = layui.mm,
+            layer = layui.layer,
+            form = layui.form,
+            $ = layui.$;
+        //页面初始加载时赋值下方的配送信息
+        var addressList = [[${addressList}]];
+        //支付方式
+        var payType = [[${payType}]];
+        console.log(payType)
+        for (address in addressList) {
+            if (addressList[address].isDefault == '1') {
+                valuationAddress(addressList[address])
+            }
+        }
+        //监听收货地址单选
+        form.on('radio(radio)', function (data) {
+            for (address in addressList) {
+                if (addressList[address].id == data.value) {
+                    valuationAddress(addressList[address])
+                }
+            }
+        });
+
+        //赋值下方的配送信息方法
+        function valuationAddress(address) {
+            $('.site').text(address.site)
+            $('.consignee').text(address.consignee + ' ' + address.phone)
+        }
+
+        //提交订单
+        form.on('submit(submit)', function (form) {
+            if (form.field.address == '' || form.field.address == null) {
+                layer.msg("请先添加收货地址", {icon: 5, time: 2000});
+                return false;
+            }
+            //解析获取的值
+            var orderInfo = [];
+            var productIdEle = $("input[name='productId']");
+            var leaveEle = $("textarea[name='leave']");
+            var wayEle = $("select[name='way']");
+            var numEle = $("input[name='num']");
+            for (var i = 0; i < productIdEle.length; i++) {
+                var obje = {};
+                obje.productId = $(productIdEle[i]).val();
+                obje.leave = $(leaveEle[i]).val();
+                obje.way = $(wayEle[i]).val();
+                obje.num = $(numEle[i]).val();
+                orderInfo.push(obje)
+            }
+            form.field.orderInfo = JSON.stringify(orderInfo);
+            //提交到后台
+            $.ajax({
+                url: '/order/submitOrder.do',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        //提交成功跳转支付页面
+                        var orderIds = result.obje;
+                        if (payType == 'alipay') {
+                            location.href = '/pay/pcTradePay?orderIds=' + JSON.stringify(orderIds)
+                        } else {
+                            location.href = '/toPayPage?orderIds=' + JSON.stringify(orderIds)
+                        }
+                    }
+                }
+
+            });
+        });
+    });
+</script>
+
+
+</body>
+</html>

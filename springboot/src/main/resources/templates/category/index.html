@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>产品分类</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<body>
+<style>
+    .layui-table-tool-self {
+        display: none;
+    }
+</style>
+
+<div class="yadmin-body animated fadeIn">
+    <table class="layui-hide" id="menu-table"></table>
+</div>
+<script type="text/html" id="toolbar">
+    <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="add">
+        <i class="layui-icon layui-icon-addition"></i>
+        新增分类
+    </button>
+</script>
+
+<script type="text/html" id="column-toolbar">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+        <i class="layui-icon layui-icon-edit" title="编辑"></i>
+        编辑
+    </button>
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title="删除"></i>
+        删除
+    </button>
+
+</script>
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource//layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+<script>
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['jquery', 'dtree', 'layer', 'table', 'element', 'tablePlug'], function () {
+        var layer = layui.layer;
+        var table = layui.table;
+        table.render({
+            elem: '#menu-table',
+            url: '/category/category.do',
+            page: true,
+            cellMinWidth: 80,
+            toolbar: '#toolbar',
+
+            cols: [
+                [
+                    {title: 'ID', type: 'numbers', width: 60},
+                    {title: '分类名称', field: 'name', align: 'center'},
+                    {title: '排序', field: 'priority', align: 'center'},
+
+                    {title: '操作', align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ]
+        });
+
+
+        table.on('toolbar', function (obj) {
+            var event = obj.event;
+            if (event === 'add') {
+                add();
+            }
+        });
+
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                edit(data.id);
+            } else if (obj.event === 'del') {
+                del(data.id);
+            } else if (obj.event === 'list') {
+                list(data.id);
+            }
+        });
+
+        function del(id) {
+            layer.confirm("你确定删除数据吗？", {icon: 3, title: '提示'},
+                function (index) {
+                    $.ajax({
+                        url: "/category/category.do",
+                        type: "post",
+                        data: {_method: "DELETE", "id": id},
+                        dataType: "json",
+                        success: function (result) {
+                            if (!result.status) {
+                                layer.msg(result.msg, {time: 2000});
+                                return false;
+                            }
+                            layer.msg("删除成功", {icon: 6});
+                            layui.table.reload('menu-table', {});
+                        }
+                    });
+                    layer.close(index);
+                }, function (index) {
+                    layer.close(index);
+                }
+            );
+        }
+
+
+        function add() {
+            layer.open({
+                content: "/category/addPage.do?parentId=" + 0,
+                title: "添加分类",
+                area: ['40%', '38%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true,
+            });
+        }
+
+        function edit(id) {
+            layer.open({
+                content: "/category/editPage.do?id=" + id,
+                title: "编辑分类",
+                area: ['40%', '38%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true,
+
+            });
+        }
+
+        function list(id) {
+            layer.open({
+                content: "/category/listPage.do?id=" + id,
+                title: "下级分类管理",
+                area: ['60%', '70%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true,
+
+            });
+        }
+    });
+</script>
+</body>
+</html>

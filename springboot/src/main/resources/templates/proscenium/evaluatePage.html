@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/userCenter.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<style>
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #cfb2f6 !important;
+    }
+
+    .layui-card-header {
+        background: #cfb2f6;
+        color: white !important;
+        font-weight: bold;
+        border-bottom: 1px solid #DEDEDE !important;
+    }
+
+    .layui-timeline-axis {
+        color: #cfb2f6 !important;
+    }
+</style>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="layui-container userpublic house-userPer content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="layui-row layui-col-space20">
+        <p class="layui-hide-xs title">首页 &gt; <span>评价车辆</span>&gt; <span th:text="${order.uuId}"></span></p>
+        <div class="layui-col-sm2">
+            <ul class="user-list">
+                <li class="active"><a href="/userCenter">个人中心</a></li>
+                <li><a href="/addProductPage">发布车辆</a></li>
+                <li><a href="/myProductPage">我的车辆</a></li>
+                <li><a href="/myOrderPage">我的出租</a></li>
+                <li><a href="/myRefundPage">归还处理</a></li>
+                <li><a href="/address">租赁人信息</a></li>
+                <li th:if="${payType eq'balance'}"><a href="/wallet">我的钱包</a></li>
+                <li><a href="/collectPage">我的收藏</a></li>
+                <li><a href="/browsePage">浏览记录</a></li>
+                <li><a href="/safety">安全设置</a></li>
+                <li><a href="/editUser">个人资料</a></li>
+                <li><a href="/leavePage">我的上报</a></li>
+
+            </ul>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="layui-form">
+                <div class="layui-fluid">
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
+                                <div class="layui-inline">
+                                    <div class="layui-input-inline">
+                                        <img th:src="${order.productImg}" style="width: 178px;height: 178px">
+                                    </div>
+
+                                    <div class="layui-input-inline" style="line-height: 44px;margin-left: 20px">
+                                        <p th:text="${order.productName}"></p>
+                                        <p th:text="${'规格:  '+order.specification}"></p>
+                                        <p th:text="${'单价:   ￥'+order.unitPrice}"></p>
+                                        <p th:text="${'数量:  '+order.num}"></p>
+                                        <p th:text="${'订单号:  '+order.uuId}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-card layui-form">
+                            <div class="layui-card-body layui-row">
+                                <div class="layui-col-md7">
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">车辆评价:</label>
+                                        <div class="layui-input-block">
+                                            <textarea placeholder="请输入内容" name="content"
+                                                      class="layui-textarea"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">晒图片:</label>
+                                        <div class="layui-input-block layui-upload">
+                                            <blockquote class="layui-elem-quote layui-quote-nm" id="upload-btn"
+                                                        style="margin-top: 10px;">
+                                                <div class="layui-upload-list" id="demo2"></div>
+                                            </blockquote>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md4" style="margin-left: 40px">
+                                    <div>
+                                        <label class="layui-form-label" style="padding: 13px 15px">评分描述:</label>
+                                        <div class="layui-input-block">
+                                            <div id="test4"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-card-body layui-row">
+                                <div class="layui-input-block">
+                                    <input hidden name="productId" th:value="${order.productId}">
+                                    <input hidden name="orderId" th:value="${order.id}">
+                                    <button type="button" class="layui-btn " lay-submit="" lay-filter="submit"
+                                            style="background: #cfb2f6;">提交评价
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'jquery', 'layer', 'rate', 'element', 'upload'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var element = layui.element;
+        var rate = layui.rate;
+        var upload = layui.upload;
+        var grade;
+        //自定义文本
+        rate.render({
+            elem: '#test4'
+            , value: 3
+            , text: true
+            , setText: function (value) { //自定义文本的回调
+                console.log(value)
+                var arrs = {
+                    '1': '极差'
+                    , '2': '差'
+                    , '3': '中等'
+                    , '4': '好'
+                    , '5': '极好'
+                };
+                grade = value;
+                this.span.text(arrs[value] || (value + "星"));
+            }
+        })
+        var img = [];
+        //多图片上传
+        upload.render({
+            elem: '#upload-btn'
+            , url: '/upload.do' //改成您自己的上传接口
+            , multiple: true
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    $('#demo2').append('<img style="width: 50px;height: 50px;margin-left: 10px" src="' + result + '" alt="' + file.name + '" class="layui-upload-img">')
+                });
+            }
+            , done: function (res) {
+                //上传完毕
+                img.push(res.obje)
+            }
+        });
+        //提交订单
+        form.on('submit(submit)', function (form) {
+            form.field.imgs = JSON.stringify(img);
+            form.field.grade = grade;
+            $.ajax({
+                url: '/order/evaluate.do',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        //评价成功跳转个人中心页面
+                        location.href = '/userCenter'
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/userCenter.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<style>
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #da697d !important;
+    }
+
+    .layui-card-header {
+        background: #da697d;
+        color: white !important;
+        font-weight: bold;
+        border-bottom: 1px solid #DEDEDE !important;
+    }
+
+    .layui-timeline-axis {
+        color: #da697d !important;
+    }
+</style>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="layui-container userpublic house-userPer content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="layui-row layui-col-space20">
+        <p class="layui-hide-xs title">首页 &gt; <span>订单详情</span>&gt; <span th:text="${order.uuId}"></span></p>
+        <div class="layui-col-sm2">
+            <ul class="user-list">
+                <li class="active"><a href="/userCenter">个人中心</a></li>
+                <li><a href="/addProductPage">发布车辆</a></li>
+                <li><a href="/myProductPage">我的车辆</a></li>
+                <li><a href="/myOrderPage">我的出租</a></li>
+                <li><a href="/myRefundPage">归还处理</a></li>
+                <li><a href="/address">租赁人信息</a></li>
+                <li th:if="${payType eq'balance'}"><a href="/wallet">我的钱包</a></li>
+                <li><a href="/collectPage">我的收藏</a></li>
+                <li><a href="/browsePage">浏览记录</a></li>
+                <li><a href="/safety">安全设置</a></li>
+                <li><a href="/editUser">个人资料</a></li>
+                <li><a href="/leavePage">我的上报</a></li>
+
+            </ul>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="layui-form">
+                <div class="layui-fluid">
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
+                                订单编号:<span th:text="${order.uuId}" style="font-size: 15px;color: red"></span>
+                                <a href="/userCenter"
+                                   style="color: #da697d;font-weight: bold;margin-left: 20px;cursor: pointer">返回 ></a>
+                            </div>
+                        </div>
+                        <div class="layui-card">
+                            <div class="layui-card-header">收件人信息</div>
+                            <div class="layui-card-body">
+                                <span th:text="${order.consigneeInfo}"></span>
+                            </div>
+                        </div>
+                        <div class="layui-card">
+                            <div class="layui-card-header">订单信息</div>
+                            <div class="layui-card-body">
+                                <div class="layui-inline">
+                                    <div class="layui-input-inline">
+                                        <img th:src="${order.productImg}" style="width: 178px;height: 178px">
+                                    </div>
+
+                                    <div class="layui-input-inline" style="line-height: 44px;margin-left: 20px">
+                                        <p th:text="${order.productName}"></p>
+                                        <p th:text="${'规格:  '+order.specification}"></p>
+                                        <p th:text="${'日租金:   ￥'+order.unitPrice}"></p>
+                                        <p th:text="${'天数:  '+order.num}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-card">
+                            <div class="layui-card-body">
+                                <div class="layui-inline">
+                                    <div class="layui-input-inline">
+                                        订单状态:
+                                        <span th:if="${order.state eq '0'}">待付款</span>
+                                        <span th:if="${order.state eq '1'}">待确认</span>
+                                        <span th:if="${order.state eq '2'}">租赁中</span>
+                                        <span th:if="${order.state eq '3'}">交易完成</span>
+                                        <span th:if="${order.state eq '4'}">归还申请中</span>
+                                        <span th:if="${order.state eq '5'}">已归还</span>
+                                        <span th:if="${order.state eq '6'}">归还失败</span>
+                                    </div>
+                                    <div class="layui-input-inline" style="margin-left: 30px">
+                                        订单生成日期: <span th:text="${#strings.substring(order.time,0,11)}"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-card">
+                            <div class="layui-card-body">
+                                <div class="layui-inline">
+                                    订单总金额: <span th:text="${'￥'+order.unitPrice*order.num}"
+                                                 style="font-size: 20px;color: red"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'jquery', 'layer', 'element', 'upload'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var element = layui.element;
+        var upload = layui.upload;
+
+
+    });
+
+</script>
+
+</body>
+</html>

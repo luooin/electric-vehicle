@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/userCenter.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<style>
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #da697d !important;
+    }</style>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="layui-container userpublic house-userPer content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="layui-row layui-col-space20">
+        <p class="layui-hide-xs title">首页 &gt; <span>安全设置</span></p>
+        <div class="layui-col-sm2">
+            <ul class="user-list">
+                <li><a href="/userCenter">个人中心</a></li>
+                <li class="active"><a href="/addProductPage">发布车辆</a></li>
+                <li><a href="/myProductPage">我的车辆</a></li>
+                <li><a href="/myOrderPage">我的出租</a></li>
+                <li><a href="/myRefundPage">归还处理</a></li>
+                <li><a href="/address">租赁人信息</a></li>
+                <li th:if="${payType eq'balance'}"><a href="/wallet">我的钱包</a></li>
+                <li><a href="/collectPage">我的收藏</a></li>
+                <li><a href="/browsePage">浏览记录</a></li>
+                <li><a href="/safety">安全设置</a></li>
+                <li><a href="/editUser">个人资料</a></li>
+                <li><a href="/leavePage">我的上报</a></li>
+
+            </ul>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="layui-form">
+                <div class="layui-fluid">
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md12">
+                            <div class="layui-card">
+                                <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                                    <div class="layui-tab-content">
+                                        <div class="layui-tab-item layui-show">
+                                            <div class="layui-card-body"
+                                                 style="padding: 20px;">
+                                                <div class="layui-form-item">
+                                                    <label for="name" class="layui-form-label">
+                                                        车辆名称:
+                                                    </label>
+                                                    <div class="layui-input-block">
+                                                        <input type="text" id="name" name="name" lay-verify="required"
+                                                               lay-vertype="tips"
+                                                               placeholder="请输入车辆名称"
+                                                               autocomplete="off"
+                                                               class="layui-input">
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label for="categoryId" class="layui-form-label">
+                                                        所属类目:
+                                                    </label>
+                                                    <div class="layui-input-block">
+                                                        <div class="layui-input-inline">
+                                                            <select name="parentCategoryId" id="parentCategoryId"
+                                                                    lay-verify="required"
+                                                                    lay-filter="parentCategoryId" lay-vertype="tips">
+                                                                <option></option>
+                                                                <option th:each="category:${categoryList}"
+                                                                        th:text="${category.name}"
+                                                                        th:value="${category.id}"></option>
+                                                            </select>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label">
+                                                        车辆主图:
+                                                    </label>
+                                                    <div class="layui-input-block">
+                                                        <div class="layui-upload-drag" id="upImg">
+                                                            <i class="layui-icon" style="color: #1E9FFF">&#xe609;</i>
+                                                            <p>建议上传时注意图片尺寸大小,否则前台图片显示不美观</p>
+                                                            <div class="layui-hide" id="uploadDemoView">
+                                                                <hr>
+                                                                <img src="" alt="上传成功后渲染" style="max-width: 196px">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label for="specification" class="layui-form-label">
+                                                        规格参数:
+                                                    </label>
+                                                    <div class="layui-input-block">
+                                                        <input type="text" id="specification" name="specification"
+                                                               lay-verify="required"
+                                                               lay-vertype="tips"
+                                                               autocomplete="off"
+                                                               placeholder="请输入规格参数" class="layui-input">
+                                                    </div>
+                                                </div>
+
+                                                <div class="layui-form-item">
+                                                    <label for="disPrice" class="layui-form-label">
+                                                        租金:
+                                                    </label>
+                                                    <div class="layui-input-block">
+                                                        <input type="number" id="disPrice" name="disPrice"
+                                                               lay-verify="required|price"
+                                                               lay-vertype="tips"
+                                                               autocomplete="off"
+                                                               placeholder="请输入租金" class="layui-input">
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item  layui-form-text">
+                                                    <label for="LAY_demo_editor" class="layui-form-label">
+                                                        车辆详情:
+                                                    </label>
+                                                    <div class="layui-input-block">
+                <textarea class="layui-textarea layui-hide" name="content" lay-verify="content"
+                          id="LAY_demo_editor"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="foot" style="text-align: center">
+                                                    <input type="hidden" id="img" name="img">
+                                                    <button type="button" class="layui-btn layui-btn-sm" lay-submit=""
+                                                            lay-filter="add" style="background: #da697d">发布
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script src="/resource/layui/layui.js"></script>
+<script th:inline="javascript">
+    //后台传入的车辆分类
+    var categoryList = [[${categoryList}]]
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).extend({
+        formSelects: 'formSelects-v4'
+    }).use(['form', 'layer', 'upload', 'layedit', 'formSelects', 'dtree'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , upload = layui.upload;
+        //拖拽上传
+        upload.render({
+            elem: '#upImg'
+            , url: '/upload.do'
+            , done: function (res) {
+                layer.msg('上传成功');
+                console.log(res)
+                layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.obje);
+                $("#img").val(res.obje);
+            }
+        });
+        //自定义验证规则
+        form.verify({
+            price: function (value) {
+                if (!new RegExp("(^[1-9]\\d*(\\.\\d{1,2})?$)|(^0(\\.\\d{1,2})?$)").test(value)) {
+                    return '请输入正确的产品价格:整数或者保留两位小数';
+                }
+            }
+
+        });
+        layedit.set({
+            //暴露layupload参数设置接口 --详细查看layupload参数说明
+            uploadImage: {
+                url: '/layeditUpload.do',
+                accept: 'image',
+                acceptMime: 'image/*',
+                exts: 'jpg|png|gif|bmp|jpeg',
+                size: '10240'
+            }
+            , uploadVideo: {
+                url: '/layeditUpload.do',
+                accept: 'video',
+                acceptMime: 'video/*',
+                exts: 'mp4|flv|avi|rm|rmvb',
+                size: '20480'
+            }
+            //右键删除图片/视频时的回调参数，post到后台删除服务器文件等操作，
+            //传递参数：
+            //图片： imgpath --图片路径
+            //视频： filepath --视频路径 imgpath --封面路径
+            , calldel: {
+                url: '/Attachment/DeleteFile'
+            }
+            //开发者模式 --默认为false
+            , devmode: true
+            //插入代码设置
+            , codeConfig: {
+                hide: true,  //是否显示编码语言选择框
+                default: 'javascript' //hide为true时的默认语言格式
+            }
+            , tool: [
+                'code', 'strong', 'italic', 'underline', 'del', 'addhr', 'fontFomatt', 'face'
+                , 'left', 'center', 'right', 'link', 'unlink', 'images', 'image_alt', 'video', 'anchors'
+                , 'table', 'fullScreen']
+
+        });
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+        form.on('submit(add)', function (form) {
+            if (form.field.img == '') {
+                layer.msg("请上传车辆图片!", {icon: 5});
+                return false
+            }
+            form.field.content = layedit.getContent(editIndex)
+            $.ajax({
+                url: '/product/product.do',
+                type: 'post',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        layer.msg("新增成功!", {
+                            icon: 6, end: function () {
+                                location.reload()
+                            }
+                        })
+                    }
+                }
+
+            });
+        });
+        //监听下拉选择框
+        form.on('select(parentCategoryId)', function (data) {
+            console.log(data.value)
+            console.log(categoryList)
+            for (category in categoryList) {
+                if (categoryList[category].id == data.value) {
+                    var sonList = categoryList[category].children;
+                    var htmlStr = "<option value=' '></option>";
+                    for (var i = 0; i < sonList.length; i++) {
+                        htmlStr += "<option value='" + sonList[i].id + "'>" + sonList[i].name + "</option>"
+                    }
+                    $("select[name='categoryId']").html(htmlStr);
+                    form.render()
+                }
+            }
+        })
+    });
+</script>
+
+</body>
+</html>

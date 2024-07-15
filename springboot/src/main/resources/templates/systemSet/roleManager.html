@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<body>
+<div class="yadmin-body animated fadeIn">
+
+    <form class="layui-form yadmin-search-area input">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label for="role" class="layui-form-label">名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="role" autocomplete="off"
+                           id="role" class="layui-input">
+                </div>
+
+                <button lay-submit="" lay-filter="search" class="layui-btn layui-btn-sm layui-btn-primary table-action">
+                    <i class="layui-icon layui-icon-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <table class="layui-hide" id="role-table"></table>
+</div>
+
+<!--<script type="text/html" id="toolbar">-->
+    <!--<button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="add">-->
+        <!--<i class="layui-icon layui-icon-addition"></i>-->
+        <!--新增-->
+    <!--</button>-->
+
+<!--</script>-->
+
+<script type="text/html" id="auth-toolbar">
+
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="grant-menu">授权菜单</a>
+
+</script>
+
+<script type="text/html" id="column-toolbar">
+
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+        <i class="layui-icon layui-icon-edit" title="编辑"></i>
+        编辑
+    </button>
+
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title="删除"></i>
+        删除
+    </button>
+
+</script>
+
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script>
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'dtree', 'form', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var dtree = layui.dtree;
+        var form = layui.form;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        form.on('submit(search)', function (form) {
+            table.reload('role-table', {
+                where: form.field
+            });
+            return false;
+        });
+        table.render({
+            elem: '#role-table',
+            url: '/role/role.do',
+            cellMinWidth: 80,
+            page: true,
+            toolbar: '#toolbar',
+            smartReloadModel: true,
+            cols: [
+                [
+                    {field: 'role', title: '角色名称', width: 120},
+                    {field: 'createName', title: '创建人', width: 120},
+                    {field: 'description', title: '描述', minWidth: 200},
+                    {title: '授权', align: 'center', width: 200, toolbar: '#auth-toolbar'},
+                    {title: '操作', fixed: 'right', width: 200, align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ]
+        });
+
+        table.on('toolbar', function (obj) {
+            var event = obj.event;
+            if (event === 'add') {
+                add();
+            }
+        });
+
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+
+            if (event === 'edit') {
+                edit(data.id);
+            } else if (event === 'grant-menu') {
+                layer.open({
+                    type: 1,
+                    title: "授权菜单",
+                    area: ["350px", "85%"],
+                    shadeClose: true,
+                    content: '<ul id="menuTree" class="dtree" data-id="0"></ul>',
+                    btn: ['确认选择'],
+                    success: function (layero, index) {
+                        dtree.render({
+                            obj: $(layero).find("#menuTree"),
+                            url: "/role/getList.do?id=" + data.id,
+                            dataStyle: "layuiStyle",
+                            method: "GET",
+                            dot: false,
+                            checkbar: true, // 开启复选框
+                            menubar: true,
+                            response: {
+                                statusCode: 0,
+                                message: "msg",
+                                treeId: "id",
+                                parentId: "parentId",
+                                title: "name"
+                            }
+                        });
+                    },
+                    yes: function (index, layero) {
+                        var flag = true;
+                        var nodes = dtree.getCheckbarNodesParam("menuTree"); // 获取选中值
+                        var ids = [];
+                        for (var key in nodes) {
+                            var node = nodes[key];
+                            ids.push(node.nodeId);
+                        }
+                        console.log(ids);
+                        $.ajax({
+                            url: "/role/accredit.do",
+                            type: "post",
+                            data: {"id": data.id, "permissionsIds": ids.toString()},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                layer.msg("授权成功", {icon: 6});
+                                layui.table.reload('role-table');
+                            }
+                        });
+                        layer.close(index);
+
+                    }
+                });
+            } else if (event === 'del') {
+                layer.confirm("确定删除角色吗?", {icon: 3, title: '提示'},
+                    function (index) {// 确定回调
+                        $.ajax({
+                            url: "/role/role.do",
+                            type: "post",
+                            data: {_method: "DELETE", "id": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('role-table');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {//取消回调
+                        layer.close(index);
+                    }
+                );
+            }
+        });
+
+        function add() {
+            layer.open({
+                content: "/role/addRole.do",
+                title: "新增角色",
+                area: ['40%', '45%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true,
+                end: function () {
+                    table.reload('role-table');
+                }
+            });
+        }
+
+        function edit(id) {
+            layer.open({
+                content: "/role/editRole.do?id=" + id,
+                title: "编辑角色",
+                area: ['40%', '45%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true,
+                end: function () {
+                    table.reload('role-table');
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

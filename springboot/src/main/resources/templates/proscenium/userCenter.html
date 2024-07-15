@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/resource/css/userCenter.css">
+
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<style>
+    .layui-table-view .layui-table[lay-skin=line] {
+        border-width: 0 0 0 0 !important;
+    }
+</style>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="layui-container userpublic house-userPer content content-nav-base">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="layui-row layui-col-space20">
+        <p class="layui-hide-xs title">首页 &gt; <span>个人中心</span></p>
+        <div class="layui-col-sm2">
+            <ul class="user-list">
+                <li class="active"><a href="/userCenter">个人中心</a></li>
+                <li><a href="/addProductPage">发布车辆</a></li>
+                <li><a href="/myProductPage">我的车辆</a></li>
+                <li><a href="/myOrderPage">我的出租</a></li>
+                <li><a href="/myRefundPage">归还处理</a></li>
+                <li><a href="/address">租赁人信息</a></li>
+                <li th:if="${payType eq'balance'}"><a href="/wallet">我的钱包</a></li>
+                <li><a href="/collectPage">我的收藏</a></li>
+                <li><a href="/browsePage">浏览记录</a></li>
+                <li><a href="/safety">安全设置</a></li>
+                <li><a href="/editUser">个人资料</a></li>
+                <li><a href="/leavePage">我的上报</a></li>
+
+
+            </ul>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="user-person">
+                <div class="person">
+                    <img th:src="${user.imgUrl}" style="border-radius: 50%">
+                    <div class="name">
+                        <p>
+                            <button th:id="${user.id}"
+                                    class="layui-btn layui-btn-xs layui-btn-primary layui-border-orange look-evl">查看评价
+                            </button>
+                        </p>
+                        <p th:text="${user.userName}"></p>
+                        <span th:if="${payType eq'balance'}"><i th:text="${user.balance}"></i></span>
+                    </div>
+                </div>
+                <ul>
+                    <li>待确认<span th:text="${num1+'个'}"></span></li>
+                    <li>租赁中<span th:text="${num2+'个'}"></span></li>
+                    <li>已完成<span th:text="${num3+'个'}"></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="layui-col-sm10">
+            <div class="layui-tab layui-tab-brief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">全部订单</li>
+                    <li>等待确认</li>
+                    <li>已确认</li>
+                    <li>交易完成</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <table id="house-user-order" lay-filter="house-user-order" class="house-user-order"></table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table id="house-user-order-state1" lay-filter="house-user-orde"
+                               class="house-user-order"></table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table id="house-user-order-state2" lay-filter="house-user-orde"
+                               class="house-user-order"></table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table id="house-user-order-state3" lay-filter="house-user-orde"
+                               class="house-user-order"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--<div class="layui-col-sm10" style="padding: 20px ">-->
+        <!--<div id="LAY_minemsg">-->
+        <!--<div th:if="${#lists.isEmpty(messageList)}" class="fly-none">您暂时没有最新消息</div>-->
+        <!--<ul th:if="not ${#lists.isEmpty(messageList)}" class="mine-msg">-->
+        <!--<div style="margin-bottom: 20px">-->
+        <!--<a class="delAll"-->
+        <!--style="color: red;cursor: pointer;"><i-->
+        <!--class="layui-icon layui-icon-delete"></i>清空全部消息</a>-->
+        <!--</div>-->
+        <!--<li data-id="123" class="message-item" th:each="message:${messageList}">-->
+        <!--<p style="text-align: left" th:utext="${message.content}">-->
+
+        <!--</p>-->
+        <!--<p><span-->
+        <!--th:utext="${#strings.substring(message.time,0,19)}">1小时前</span>-->
+        <!--<a th:id="${message.id}" href="javascript:;" class="fly-delete"><i-->
+        <!--class="layui-icon layui-icon-delete"></i></a>-->
+        <!--</p>-->
+        <!--</li>-->
+        <!--</ul>-->
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script type="text/html" id="orderTpl">
+    <div style="text-align: left; display: inline-block; vertical-align: middle;">
+        <p>订单号：{{d.uuId}}</p>
+        <p>租赁周期：{{d.time.substring(0,11)}}-{{d.endTime}}</p>
+        {{# if(d.state == 3){ }}
+        <p>状态:<span style="color: #999;">已完成</span></p>
+        {{# } else if(d.state == 2){ }}
+        <p>状态:<span style="color: #ee715f;">租赁中</span></p>
+        {{# } else if(d.state == 1){ }}
+        <p>状态:<span style="color: #5fd4e6;">待确认</span></p>
+        {{# } else if(d.state == 4){ }}
+        <p>状态:<span style="color: #73c292;">归还申请中</span></p>
+        {{# } else if(d.state == 5){ }}
+        <p>状态:<span style="color: #999;">已归还</span></p>
+        {{# } else if(d.state == 6){ }}
+        <p>状态:<span style="color: #999;">归还失败</span></p>
+        {{# } else { }}
+        <!--<p>状态:<span style="color: #e09b4e;">待付款</span>&nbsp;剩余:<span-->
+        <!--style="color: #FF5722">{{d.distanceHour}}</span></p>-->
+        <p>状态:<span style="color: #e09b4e;">待付款</span></p>
+        {{# } }}
+    </div>
+</script>
+<script type="text/html" id="imgTpl">
+    <img src="{{d.productImg}}">
+</script>
+<script type="text/html" id="priceTpl">
+    <div style="display: inline-block; vertical-align: middle;">
+        <p>￥{{d.unitPrice*d.num}}</p>
+    </div>
+</script>
+<script type="text/html" id="stateTpl">
+    {{#  if(d.state == 3){ }}
+    <span style="color: #999;">已完成</span>
+    {{#  } else if(d.state == 2){ }}
+    <span style="color: #ee715f;">租赁中</span>
+    {{#  } else if(d.state == 1){ }}
+    <span style="color: #5fd4e6;">待确认</span>
+    {{#  } else if(d.state == 4){ }}
+    <span style="color: #73c292;">归还申请中</span>
+    {{#  } else if(d.state == 5){ }}
+    <span style="color: #999;">已归还</span>
+    {{#  } else if(d.state == 6){ }}
+    <span style="color: #999;">归还失败</span>
+    {{#  } else { }}
+    <!--<span style="color: #e09b4e;">待付款剩余：<span id="count-down">{{d.distanceHour}}</span></span>-->
+    <span style="color: #e09b4e;">待付款</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="handleTpl">
+    <div style="display: inline-block; vertical-align: middle;">
+        <a class="handel" lay-event="details" style="color: #e39d55; cursor: pointer; display: block;">查看详情</a>
+        {{# if(d.state == 2){ }}
+        <a class="handel" lay-event="evaluate" style="color: #e39d55; cursor: pointer; display: block;">评价</a>
+        {{# } else if(d.state ==0){ }}
+        <a class="handel" lay-event="toPay" style="color: #e39d55; cursor: pointer; display: block;">去付款</a>
+        {{# } else if(d.state != 4 && d.state !=5 && d.state !=6 && d.state !=1 && d.state !=0){ }}
+        <a class="handel" lay-event="refund" style="color: #e39d55; cursor: pointer; display: block;">申请归还</a>
+        {{# } }}
+        {{# if(d.state == 5 ){ }}
+        <a class="handel" lay-event="delete" style="color: #e39d55; cursor: pointer; display: block;">删除订单</a>
+        {{# } }}
+    </div>
+</script>
+<script type="text/html" id="column-toolbar01">
+    <!--<button type="button" class="layui-btn layui-btn-normal  layui-btn-xs" lay-event="edit">-->
+    <!--<i class="layui-icon layui-icon-dialogue" title="回复"></i>-->
+    <!--回复-->
+    <!--</button>-->
+    <button type="button" class="layui-btn layui-btn-danger  layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title=""></i>
+        删除
+    </button>
+</script>
+<script type="text/html" id="urlTpl">
+    <span style="cursor: pointer;color: #1E9FFF"><i class="layui-icon layui-icon-picture"></i>点击查看</span>
+</script>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['table', 'jquery', 'element'], function () {
+        var mm = layui.mm,
+            $ = layui.$,
+            table = layui.table;
+        //全部订单
+        var payType = [[${payType}]];
+        table.render({
+            elem: '#house-user-order'
+            , url: '/order/orderPro.do'
+            , skin: 'line'
+            , cols: [[
+                {title: '订单信息', align: 'center', templet: '#orderTpl'}
+                , {field: 'avatar', title: '租赁车辆', templet: '#imgTpl', align: 'center'}
+                , {field: 'num', title: '天数', align: 'center', width: 80}
+                , {title: '日租金', align: 'center', templet: '#priceTpl', width: 100}
+                // , {title: '订单状态', align: 'center', templet: '#stateTpl', width: 100}
+                , {title: '订单操作', align: 'center', templet: '#handleTpl', width: 120}
+            ]]
+        });
+        //等待确认
+        table.render({
+            elem: '#house-user-order-state1'
+            , url: '/order/orderPro.do'
+            , skin: 'line'
+            , where: {'state': '1'}
+            , cols: [[
+                {title: '订单信息', align: 'center', templet: '#orderTpl'}
+                , {field: 'avatar', title: '租赁车辆', templet: '#imgTpl', align: 'center'}
+                , {field: 'num', title: '天数', align: 'center', width: 80}
+                , {title: '日租金', align: 'center', templet: '#priceTpl', width: 100}
+                // , {title: '订单状态', align: 'center', templet: '#stateTpl', width: 100}
+                , {title: '订单操作', align: 'center', templet: '#handleTpl', width: 120}
+            ]]
+        });
+        //已确认
+        table.render({
+            elem: '#house-user-order-state2'
+            , url: '/order/orderPro.do'
+            , skin: 'line'
+            , where: {'state': '2'}
+            , cols: [[
+                {title: '订单信息', align: 'center', templet: '#orderTpl'}
+                , {field: 'avatar', title: '租赁车辆', templet: '#imgTpl', align: 'center'}
+                , {field: 'num', title: '天数', align: 'center', width: 80}
+                , {title: '日租金', align: 'center', templet: '#priceTpl', width: 100}
+                //, {title: '订单状态', align: 'center', templet: '#stateTpl', width: 100}
+                , {title: '订单操作', align: 'center', templet: '#handleTpl', width: 120}
+            ]]
+        });
+        //交易完成
+        table.render({
+            elem: '#house-user-order-state3'
+            , url: '/order/orderPro.do'
+            , skin: 'line'
+            , where: {'state': '3'}
+            , cols: [[
+                {title: '订单信息', align: 'center', templet: '#orderTpl'}
+                , {field: 'avatar', title: '租赁车辆', templet: '#imgTpl', align: 'center'}
+                , {field: 'num', title: '天数', align: 'center', width: 80}
+                , {title: '日租金', align: 'center', templet: '#priceTpl', width: 100}
+                //, {title: '订单状态', align: 'center', templet: '#stateTpl', width: 100}
+                , {title: '订单操作', align: 'center', templet: '#handleTpl', width: 120}
+            ]]
+        });
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'details') {
+                location.href = '/orderDetails?id=' + data.id;
+            }
+            if (obj.event === 'evaluate') {
+                location.href = '/evaluatePage?id=' + data.id;
+            }
+            if (obj.event === 'refund') {
+                location.href = '/refundPage?id=' + data.id;
+            }
+            if (obj.event === 'toPay') {
+                var orderIds = [];
+                orderIds.push(data.id)
+                if (payType == 'alipay') {
+                    location.href = '/pay/pcTradePay?orderIds=' + JSON.stringify(orderIds)
+                } else {
+                    location.href = '/toPayPage?orderIds=' + JSON.stringify(orderIds);
+                }
+            }
+            if (obj.event === 'delete') {
+                $.ajax({
+                    url: "/order/order.do",
+                    type: "put",
+                    data: {"id": data.id, 'isDelete': "1"},
+                    dataType: "json",
+                    success: function (result) {
+                        if (!result.status) {
+                            return false;
+                        }
+                        layer.msg("删除成功!", {
+                            icon: 6, time: 1000, end: function () {
+                                location.reload()
+                            }
+                        })
+                    }
+                });
+            }
+        });
+        //查看评价图片
+        $('.look-evl').on('click', function () {
+            var id = $(this).attr("id");
+            //弹出评价列表
+            layer.open({
+                content: "/product/evaluatePro.do?productId=" + id,
+                title: "评价列表",
+                area: ['60%', '70%'],
+                type: 2,
+                maxmin: true,
+                shadeClose: true
+            });
+        })
+        //删除消息
+        $('.fly-delete').on('click', function () {
+            var id = $(this).attr('id');
+            var li = $(this).parents('li');
+            layer.confirm('确定删除此消息吗?', function (index) {
+                $.ajax({
+                    url: '/message/message.do',
+                    type: 'post',
+                    data: {_method: "DELETE", "id": id},
+                    dataType: 'json',
+                    async: false,
+                    success: function (result) {
+                        if (!result.status) {
+                            layer.msg(result.msg, {icon: 5});
+                            return false;
+                        } else {
+                            li.remove()
+                            layer.msg(result.msg, {icon: 6,})
+                        }
+                    }
+                });
+                layer.close(index);
+            })
+        })
+        //删除全部
+        $('.delAll').on('click', function () {
+            layer.confirm('确定清空所有消息吗?', function (index) {
+                $.ajax({
+                    url: '/message/delAll.do',
+                    type: 'post',
+                    dataType: 'json',
+                    async: false,
+                    success: function (result) {
+                        if (!result.status) {
+                            layer.msg(result.msg, {icon: 5});
+                            return false;
+                        } else {
+                            location.reload()
+                        }
+                    }
+                });
+                layer.close(index);
+            })
+        })
+    });
+</script>
+</body>
+</html>

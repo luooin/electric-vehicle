@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加菜单</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <link rel="stylesheet" href="/resource/layui/extend/autocomplete.css">
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <div method="post" class="layui-form layui-form-pane">
+        <div class="layui-form-item">
+            <label for="name" class="layui-form-label">
+                分类名称
+            </label>
+            <div class="layui-input-block">
+                <input type="text" id="name" name="name" value=""
+                       lay-verify="required" lay-vertype="tips"
+                       autocomplete="off" placeholder="请输入分类名称" class="layui-input">
+                <input id="parentId" name="parentId" hidden="" th:value="${parentId}"/>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="priority" class="layui-form-label">
+                排序
+            </label>
+            <div class="layui-input-block">
+                <input type="number" id="priority" name="priority"
+                       lay-verify="required" lay-vertype="tips"
+                       autocomplete="off" placeholder="请输入排序" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left:0;text-align:center;">
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="add">增加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource//js/common.js"></script>
+
+<script>
+    layui.config({
+        base: '/resource//layui/extend/'
+    }).use(['form', 'layer', 'autocomplete', 'dtree'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer,
+            autocomplete = layui.autocomplete,
+            dtree = layui.dtree;
+        form.on('submit(add)', function (data) {
+            $.ajax({
+                url: '/category/category.do',
+                type: 'post',
+                data: data.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    console.log(result)
+                    if (result.status) {
+                        parent.layer.msg("新增成功!", {icon: 6});
+                        parent.layui.table.reload('menu-table', {});
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    } else {
+                        layer.msg(result.msg);
+                    }
+                }
+
+            });
+        });
+
+    });
+</script>
+
+</body>
+</html>

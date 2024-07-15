@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" href="/resource/remixicon/fonts/remixicon.css">
+</head>
+<style>
+    .layui-form-label {
+        width: 90px;
+    }
+
+    div.layui-input-inline {
+        display: inline-block;
+    }
+
+    .layui-input-inline {
+        position: relative;
+    }
+
+    .layui-input-inline > input {
+        padding-left: 6px;
+        padding-right: 24px;
+    }
+
+    .layui-input-inline > [class*="layui-icon-"] {
+        padding: 0 3px;
+        z-index: 999;
+        position: absolute;
+        top: 3px;
+        bottom: 1px;
+        right: 3px;
+        line-height: 28px;
+        display: inline-block;
+        color: #909090;
+        font-size: 16px;
+    }
+</style>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <table class="layui-hide" id="table-list"></table>
+</div>
+
+
+<script type="text/html" id="column-toolbar">
+    <button type="button" class="layui-btn layui-btn-danger  layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete" title=""></i>
+        删除
+    </button>
+</script>
+<script type="text/html" id="urlTpl">
+    <span style="cursor: pointer;color: #1E9FFF"><i class="layui-icon layui-icon-picture"></i>点击查看</span>
+</script>
+<script src="/resource/js/jquery.js"></script>
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script th:inline="javascript">
+    var leaveId = [[${leaveId}]]
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).use(['table', 'element', 'dtree', 'laydate', 'form', 'tablePlug'], function () {
+        var table = layui.table;
+        var $ = layui.$;
+        var dtree = layui.dtree;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var tablePlug = layui.tablePlug;
+        tablePlug.smartReload.enable(true);
+        table.render({
+            elem: '#table-list',
+            url: '/leave/reply.do',
+            cellMinWidth: 80,
+            page: true,
+            toolbar: '#toolbar',
+            where: {'leaveId': leaveId},
+            smartReloadModel: true,
+            cols: [
+                [
+                    {field: 'userName', title: '回复用户', width: 120},
+                    {field: 'content', title: '回复内容'},
+                    {field: 'time', title: '日期', width: 120,},
+                    {title: '操作', fixed: 'right', width: 100, align: 'center', toolbar: '#column-toolbar'}
+                ]
+            ]
+        });
+
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            console.log(data)
+            if (event === 'del') {
+                layer.confirm("确定删除吗?", {icon: 3, title: '提示'},
+                    function (index) {// 确定回调
+                        $.ajax({
+                            url: "/leave/reply.do",
+                            type: "post",
+                            data: {_method: "DELETE", "id": data.id},
+                            dataType: "json",
+                            success: function (result) {
+                                if (!result.status) {
+                                    layer.msg(result.msg, {time: 2000});
+                                    return false;
+                                }
+                                parent.layer.msg("删除成功", {icon: 6});
+                                layui.table.reload('table-list');
+                            }
+                        });
+                        layer.close(index);
+                    }, function (index) {//取消回调
+                        layer.close(index);
+                    }
+                );
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

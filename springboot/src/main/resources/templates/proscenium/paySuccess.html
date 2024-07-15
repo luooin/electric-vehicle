@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}">Document</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<style>
+    .layui-tab-brief > .layui-tab-title .layui-this {
+        color: #da697d !important;
+    }
+
+    .layui-tab-brief > .layui-tab-more li.layui-this:after, .layui-tab-brief > .layui-tab-title .layui-this:after {
+        border-bottom: 2px solid #da697d !important;
+    }
+
+    .layui-card-header {
+        background: #f2f2f2;
+        border-bottom: 1px solid #DEDEDE !important;
+    }
+
+    .layui-card {
+        border-bottom: 1px solid #DEDEDE
+    }
+
+    .layui-form-radio > i:hover, .layui-form-radioed > i {
+        color: #da697d !important;
+    }
+
+</style>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base datails-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="data-cont-wrap w1200 layui-form">
+        <div style="padding: 20px;">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12" style="padding-bottom: 12%">
+                    <div class="layui-card">
+                        <div class="layui-card-body"
+                             style=" display: flex;align-items: center;justify-content: center;padding-top: 100px;padding-bottom: 100px">
+                            <div class="layui-row" style="width: 50%; ">
+                                <div class="layui-col-md4">
+                                    <img src="/resource/image/paysuccess.png">
+                                </div>
+                                <div class="layui-col-md8" style="line-height: 30px">
+                                    <p style="font-size: 20px;font-weight: bold">支付成功！</p>
+                                    <p>您的订单已经支付成功，请耐心等待。</p>
+                                    <p style="margin-top: 30px">
+                                        <a href="/userCenter">
+                                            <button type="button" class="layui-btn " lay-submit="" lay-filter="submit"
+                                                    style="background: #da697d;">个人中心
+                                            </button>
+                                        </a>
+                                        <a href="/productList">
+                                            <button type="button" class="layui-btn " lay-submit="" lay-filter="submit"
+                                                    style="background: #666;">继续购物
+                                            </button>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer" th:replace="proscenium/public :: footer"></div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script type="text/javascript" th:inline="javascript">
+    layui.config({
+        base: '/resource/js/' //你存放新模块的目录，注意，不是layui的模块目录
+    }).use(['mm', 'jquery', 'layer', 'form'], function () {
+        var mm = layui.mm,
+            layer = layui.layer,
+            form = layui.form,
+            $ = layui.$;
+
+    });
+</script>
+
+
+</body>
+</html>

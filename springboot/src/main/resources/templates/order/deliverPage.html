@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/css/common.css">
+    <link rel="stylesheet" href="/resource/layui/extend/dtree.css">
+    <link rel="stylesheet" href="/resource/layui/extend/font/dtreefont.css">
+    <link rel="stylesheet" href="/resource/layui/extend/formSelects-v4.css">
+</head>
+<style>
+    .layui-form-label {
+        width: 90px;
+    }
+</style>
+<body>
+<div class="yadmin-body animated fadeIn">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label for="company" class="layui-form-label">
+                快递公司:
+            </label>
+            <div class="layui-input-block">
+                <select name="company" id="company" lay-verify="required" lay-vertype="tips">
+                    <option></option>
+                    <option>圆通快递</option>
+                    <option>中通快递</option>
+                    <option>申通快递</option>
+                    <option>顺丰快递</option>
+                    <option>韵达快递</option>
+                    <option>邮政EMS</option>
+                </select>
+            </div>
+        </div>
+     
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left:0;text-align:center;">
+                <input type="hidden" id="id" th:value="${id}" name="id">
+                <button class="layui-btn layui-btn-normal btn-w100" lay-submit="" lay-filter="edit">确定确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/resource/layui/layui.js"></script>
+<script src="/resource/js/common.js"></script>
+
+<script>
+    layui.config({
+        base: '/resource/layui/extend/'
+    }).extend({
+        formSelects: 'formSelects-v4'
+    }).use(['form', 'layer', 'upload', 'layedit', 'formSelects', 'dtree'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+        form.on('submit(edit)', function (form) {
+            form.field.state = "2"
+            $.ajax({
+                url: '/order/order.do',
+                type: 'put',
+                data: form.field,
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (!result.status) {
+                        parent.layer.msg(result.msg, {time: 2000});
+                        return false;
+                    } else {
+                        parent.layer.msg("确认成功!", {icon: 6});
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                        parent.layui.table.reload('table-list', {});
+                    }
+                }
+
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

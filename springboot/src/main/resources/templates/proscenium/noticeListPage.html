@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${wbeParameter.name}"</title>
+    <link rel="icon" href="/resource/shopping.png">
+    <link rel="stylesheet" type="text/css" href="/resource/css/main.css">
+    <!-- layui样式 -->
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+</head>
+<body>
+<div th:replace="proscenium/public :: head"></div>
+<div class="content content-nav-base information-content">
+    <div class="main-nav" th:replace="proscenium/public :: main-nav"></div>
+    <div class="info-list-box" style="background: url('/resource/image/webImg2.jpeg ');background-size: 100% 100%">
+        <div class="info-list w1200">
+            <div class="item-box layui-clear" id="list-cont">
+                <div class="layui-card" style="padding: 20px;border-radius: 20px">
+                    <table class="layui-table" lay-even="" lay-skin="line">
+                        <colgroup>
+                            <col>
+                            <col width="200">
+                        </colgroup>
+                        <tbody>
+                        <tr th:each="notice:${noticeList}">
+                            <td><a style="color: #da697d" th:href="${'/noticeDetailsPage?id='+notice.id}"
+                                   th:text="${notice.title}"></a>
+                            </td>
+                            <td th:text="${#strings.substring(notice.time,0,19)}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/resource/layui/layui.js"></script>
+<script>
+    layui.use(['laypage'], function () {
+        var laypage = layui.laypage;
+        laypage.render({
+            elem: 'demo0'
+            , count: 100 //数据总数
+        });
+    });
+
+</script>
+
+
+</body>
+</html>
